@@ -284,6 +284,10 @@ class canvas
     ///
     ~canvas();
 
+    /// @brief  Efficiently clears whole canvas to black.
+    ///
+    void clear();
+
     // ======== TRANSFORMS ========
 
     /// @brief  Scale the current transform.
@@ -2827,6 +2831,16 @@ canvas::~canvas()
         saves = head->saves;
         head->saves = 0;
         delete head;
+    }
+}
+
+void canvas::clear()
+{
+    const rgba black(0, 0, 0, 1);
+    const int px_count = size_x * size_y;
+    for (int i = 0; i < px_count; ++i)
+    {
+        bitmap[i] = black;
     }
 }
 

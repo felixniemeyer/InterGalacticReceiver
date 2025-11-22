@@ -1,6 +1,7 @@
 #include "hardware_controller.h"
 
 // Local dependencies
+#include "magic.h"
 
 // Global
 #include <errno.h>
@@ -11,10 +12,6 @@
 #include <string.h>
 #include <sys/ioctl.h>
 #include <unistd.h>
-
-#define SLAVE_ADDRESS 0x50
-#define I2C_NODE "/dev/i2c-1"
-#define CYCLE_MSEC 50
 
 uint8_t HardwareController::buffer[buf_sz] = {0};
 int HardwareController::file_i2c = -1;
@@ -119,7 +116,7 @@ void *HardwareController::loop(void *)
 
     while (!quitting)
     {
-        usleep(CYCLE_MSEC * 1000);
+        usleep(HWCTRL_CYCLE_MSEC * 1000);
 
         // Send commands from queue
         while (true)
