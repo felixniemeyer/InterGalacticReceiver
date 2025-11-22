@@ -29,7 +29,7 @@ class HardwareController
     static void process_values(const InputReadings &data);
 
   public:
-    static bool init();
+    static void init();
     static void exit();
     static void get_values(int &tuner, int &aknob, int &bknob, int &cknob, int &swtch);
     static void set_light(bool on);

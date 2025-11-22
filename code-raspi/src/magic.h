@@ -10,6 +10,6 @@
 #define SLAVE_ADDRESS       0x50
 #define HWCTRL_CYCLE_MSEC   50
 
-// clang-format om
+// clang-format on
 
 #endif

@@ -1,5 +1,5 @@
 CXX = g++
-CXX_FLAGS = -std=c++11 -Wall -O3 -march=native -funroll-loops -fstrict-aliasing
+CXX_FLAGS = -std=c++11 -Wall -O3 -march=native -funroll-loops -fstrict-aliasing -g -rdynamic
 
 BIN = igr
 SRC_DIR = ./src

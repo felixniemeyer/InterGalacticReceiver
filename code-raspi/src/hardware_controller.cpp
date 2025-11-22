@@ -1,6 +1,7 @@
 #include "hardware_controller.h"
 
 // Local dependencies
+#include "error.h"
 #include "magic.h"
 
 // Global
@@ -50,50 +51,51 @@ struct Lock
     }
 };
 
-bool HardwareController::init()
+void HardwareController::init()
 {
     // Open I2C bus
     char *filename = (char *)I2C_NODE;
     if ((file_i2c = open(filename, O_RDWR)) < 0)
     {
-        fprintf(stderr, "Failed to open the I2C bus '%s': %d: %s\n", filename, errno, strerror(errno));
         deinit();
-        return false;
+        throwf_errno("Failed to open the I2C bus '%s'", filename);
     }
 
     // Access
     int addr = SLAVE_ADDRESS;
     if (ioctl(file_i2c, I2C_SLAVE, addr) < 0)
     {
-        fprintf(stderr, "Failed to acquire I2C bus access: %s\n", strerror(errno));
         deinit();
-        return false;
+        throwf_errno("Failed to acquire I2C bus access");
     }
 
     int r = pthread_mutex_init(&mut, NULL);
     if (r != 0)
     {
-        fprintf(stderr, "Failed to initialize HardwareController mutex: %s\n", strerror(r));
         deinit();
-        return false;
+        throwf("Failed to initialize mutex: %d: %s", r, strerror(r));
     }
 
     // Start worker thread
     r = pthread_create(&thread, NULL, loop, NULL);
     if (r != 0)
     {
-        fprintf(stderr, "Failed to create HardwareController thread: %s\n", strerror(r));
         deinit();
-        return false;
+        throwf("Failed to create thread: %d: %s", r, strerror(r));
     }
     pthread_detach(thread);
-    return true;
 }
 
 void HardwareController::deinit()
 {
-    if (file_i2c != -1) close(file_i2c);
-    file_i2c = -1;
+    try
+    {
+        if (file_i2c != -1) close(file_i2c);
+        file_i2c = -1;
+    }
+    catch (...)
+    {
+    }
 }
 
 void HardwareController::exit()

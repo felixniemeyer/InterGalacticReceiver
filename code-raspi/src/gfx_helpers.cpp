@@ -1,6 +1,8 @@
 #include "gfx_helpers.h"
 
 // Local dependencies
+#include "canvas_ity.h"
+#include "error.h"
 #include "magic.h"
 
 // Global
@@ -15,22 +17,15 @@
 #include <sys/mman.h>
 #include <unistd.h>
 
-// Implementation of canvas_ity in this .o
-#define CANVAS_ITY_IMPLEMENTATION
-#include "canvas_ity.h"
-
 static const size_t buf_sz = 4096;
 static char buf[buf_sz];
 static const char *font_file_name = "IBMPlexMono-Regular.ttf";
 
-int flush_to_fb(float *image)
+void flush_to_fb(float *image)
 {
     int fb = open(FB_PATH, O_RDWR);
     if (fb < 0)
-    {
-        fprintf(stderr, "Failed to open '%s': %d: %s\n", FB_PATH, errno, strerror(errno));
-        return 1;
-    }
+        throwf_errno("Failed to open '%s'", FB_PATH);
 
     struct fb_var_screeninfo vinfo;
     struct fb_fix_screeninfo finfo;
@@ -40,23 +35,15 @@ int flush_to_fb(float *image)
     // printf("Framebuffer size: %d x %d; bits per pixel: %d\n", vinfo.xres, vinfo.yres, vinfo.bits_per_pixel);
 
     if (vinfo.xres != W || vinfo.yres != H)
-    {
-        fprintf(stderr, "Framebuffer resolution doesn't match image size of %d x %d\n", W, H);
-        return 1;
-    }
+        throwf("Framebuffer resolution (%d x %d) doesn't match image size of %d x %d", vinfo.xres, vinfo.yres, W, H);
+
     if (vinfo.bits_per_pixel != 16)
-    {
-        fprintf(stderr, "Expected 16 bits per pixel, got %d\n", vinfo.bits_per_pixel);
-        return 1;
-    }
+        throwf("Expected 16 bits per pixel, got %d", vinfo.bits_per_pixel);
 
     long screensize = vinfo.yres_virtual * finfo.line_length;
     char *fbp = (char *)mmap(0, screensize, PROT_READ | PROT_WRITE, MAP_SHARED, fb, 0);
     if (fbp == MAP_FAILED)
-    {
-        fprintf(stderr, "Failed to map frame buffer to memory: %d: %s\n", errno, strerror(errno));
-        return 1;
-    }
+        throwf_errno("Failed to map frame buffer to memory: %d: %s");
 
     for (int y = 0; y < H; ++y)
     {
@@ -81,17 +68,14 @@ int flush_to_fb(float *image)
 
     munmap(fbp, screensize);
     close(fb);
-    return 0;
 }
 
 uint8_t *load_file(const char *path, size_t *size_out)
 {
     FILE *f = fopen(path, "rb");
     if (!f)
-    {
-        fprintf(stderr, "Failed to open '%s': %d: %s\n", path, errno, strerror(errno));
-        return nullptr;
-    }
+        throwf_errno("Failed to open '%s'", path);
+
     fseek(f, 0, SEEK_END);
     size_t size = ftell(f);
     rewind(f);
@@ -99,9 +83,8 @@ uint8_t *load_file(const char *path, size_t *size_out)
     unsigned char *buf = (unsigned char *)malloc(size);
     if (!buf)
     {
-        fprintf(stderr, "Failed to allocated %lu bytes.\n", size);
         fclose(f);
-        return nullptr;
+        throwf("Failed to allocated %lu bytes", size);
     }
 
     fread(buf, 1, size, f);
