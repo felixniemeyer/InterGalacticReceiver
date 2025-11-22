@@ -21,6 +21,10 @@
 #include <sys/mman.h>
 #include <unistd.h>
 
+// Overscan empirical test:
+// const int vm = 4, hm = 46;
+// This is not fully centered: slighty offset to the left
+
 static uint8_t *font_data;
 static size_t font_data_size;
 
@@ -70,17 +74,18 @@ int main()
 
         int freq = tuner_val_to_freq(tuner);
 
-        // printf("\rTuner  %4d  SW %4d   ", tuner, swtch);
-
         usleep(100000);
 
         ctx.clear();
 
-        ctx.set_line_width(6.0f);
-        ctx.set_color(canvas_ity::stroke_style, 0.95, 0.65, 0.15, 1.0);
-        ctx.begin_path();
-        ctx.arc(360, 250, 70, 0, M_PI * 2);
-        ctx.stroke();
+        // ctx.set_line_width(6.0f);
+        // ctx.set_color(canvas_ity::stroke_style, 0.95, 0.65, 0.15, 1.0);
+        // ctx.begin_path();
+        // ctx.arc(360, 250, 70, 0, M_PI * 2);
+        // ctx.stroke();
+        // const int vm = 4, hm = 46;
+        // ctx.set_line_width(1.0f);
+        // ctx.stroke_rectangle(hm, vm, W - 2 * hm, H - 2 * vm);
 
         ctx.set_color(canvas_ity::fill_style, 0.8, 0.8, 0.8, 1);
         sprintf(buf, "Tuner %5d", tuner);
