@@ -1,3 +1,4 @@
+MAKEFLAGS += -j3 # parallel processes
 CXX = g++
 CXX_FLAGS = -std=c++11 -Wall -O3 -march=native -funroll-loops -fstrict-aliasing -g -rdynamic
 
