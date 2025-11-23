@@ -3,5 +3,6 @@
 
 int main(int argc, char *argv[]);
 void calibrate_readings();
+void test_tuner();
 
 #endif

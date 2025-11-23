@@ -2,13 +2,14 @@
 
 // Local dependencies
 #include "error.h"
+#include "lock.h"
 #include "magic.h"
+#include "value_listener_if.h"
 
 // Global
 #include <errno.h>
 #include <fcntl.h>
 #include <linux/i2c-dev.h>
-#include <math.h>
 #include <stdio.h>
 #include <string.h>
 #include <sys/ioctl.h>
@@ -25,6 +26,7 @@ int HardwareController::val_aknob;
 int HardwareController::val_bknob;
 int HardwareController::val_cknob;
 int HardwareController::val_swtch;
+IValueListener *HardwareController::tuner = nullptr;
 
 #pragma pack(push, 1)
 struct InputReadings
@@ -36,20 +38,6 @@ struct InputReadings
     uint8_t swtch;
 };
 #pragma pack(pop)
-
-struct Lock
-{
-    pthread_mutex_t *mut;
-    Lock(pthread_mutex_t *mut)
-        : mut(mut)
-    {
-        pthread_mutex_lock(mut);
-    }
-    ~Lock()
-    {
-        pthread_mutex_unlock(mut);
-    }
-};
 
 void HardwareController::init()
 {
@@ -96,6 +84,11 @@ void HardwareController::deinit()
     catch (...)
     {
     }
+}
+
+void HardwareController::set_listeners(IValueListener *tuner)
+{
+    HardwareController::tuner = tuner;
 }
 
 void HardwareController::exit()
@@ -179,11 +172,15 @@ void *HardwareController::loop(void *)
 
 void HardwareController::process_values(const InputReadings &data)
 {
-    __atomic_store_n(&val_tuner, (int)data.tuner, __ATOMIC_SEQ_CST);
+    // Discard nonsense values
+    if (data.tuner > 100 && data.tuner < 924)
+        __atomic_store_n(&val_tuner, (int)data.tuner, __ATOMIC_SEQ_CST);
     __atomic_store_n(&val_aknob, (int)data.aKnob, __ATOMIC_SEQ_CST);
     __atomic_store_n(&val_bknob, (int)data.bKnob, __ATOMIC_SEQ_CST);
     __atomic_store_n(&val_cknob, (int)data.cKnob, __ATOMIC_SEQ_CST);
     __atomic_store_n(&val_swtch, (int)data.swtch, __ATOMIC_SEQ_CST);
+    // Update listeners with filtered values
+    if (tuner != nullptr) tuner->update(val_tuner);
 }
 
 void HardwareController::get_values(int &tuner, int &aknob, int &bknob, int &cknob, int &swtch)
@@ -200,48 +197,4 @@ void HardwareController::set_light(bool on)
     uint8_t cmd = on ? 0x11 : 0x10;
     Lock lock(&mut);
     commands.push_back(cmd);
-}
-
-int tuner_val_to_freq(int val)
-{
-    // Know values for Lagrange interpolation:
-    // 144 =>  90 MHz
-    // 473 =>  98 MHz
-    // 703 => 102 MHz
-
-    const double x1 = 144, y1 = 90;
-    const double x2 = 473, y2 = 98;
-    const double x3 = 703, y3 = 102;
-
-    double x = val;
-
-    // clang-format off
-    double freq = y1 * ((x - x2)*(x - x3)) / ((x1 - x2)*(x1 - x3))
-                + y2 * ((x - x1)*(x - x3)) / ((x2 - x1)*(x2 - x3))
-                + y3 * ((x - x1)*(x - x2)) / ((x3 - x1)*(x3 - x2));
-    // clang-format on
-
-    return (int)round(freq * 10);
-}
-
-int freq_to_tuner_val(int freq)
-{
-    // Know values for Lagrange interpolation:
-    // 144 =>  90 MHz
-    // 473 =>  98 MHz
-    // 703 => 102 MHz
-
-    const double y1 = 144, x1 = 90;
-    const double y2 = 473, x2 = 98;
-    const double y3 = 703, x3 = 102;
-
-    double x = freq;
-
-    // clang-format off
-    double val  = y1 * ((x - x2)*(x - x3)) / ((x1 - x2)*(x1 - x3))
-                + y2 * ((x - x1)*(x - x3)) / ((x2 - x1)*(x2 - x3))
-                + y3 * ((x - x1)*(x - x2)) / ((x3 - x1)*(x3 - x2));
-    // clang-format on
-
-    return (int)round(val * 10);
 }

@@ -6,6 +6,7 @@
 #include <vector>
 
 struct InputReadings;
+class IValueListener;
 
 class HardwareController
 {
@@ -22,6 +23,7 @@ class HardwareController
     static int val_bknob;
     static int val_cknob;
     static int val_swtch;
+    static IValueListener *tuner;
 
   private:
     static void *loop(void *);
@@ -30,12 +32,10 @@ class HardwareController
 
   public:
     static void init();
+    static void set_listeners(IValueListener *tuner);
     static void exit();
     static void get_values(int &tuner, int &aknob, int &bknob, int &cknob, int &swtch);
     static void set_light(bool on);
 };
-
-int tuner_val_to_freq(int val);
-int freq_to_tuner_val(int freq);
 
 #endif

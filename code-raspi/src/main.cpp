@@ -10,7 +10,8 @@ int main(int argc, char *argv[])
 {
     try
     {
-        calibrate_readings();
+        // calibrate_readings();
+        test_tuner();
         return 0;
     }
     catch (const igr_exception &e)

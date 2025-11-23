@@ -8,7 +8,7 @@
 #define FB_PATH             "/dev/fb0"
 #define I2C_NODE            "/dev/i2c-1"
 #define SLAVE_ADDRESS       0x50
-#define HWCTRL_CYCLE_MSEC   50
+#define HWCTRL_CYCLE_MSEC   20
 
 // clang-format on
 

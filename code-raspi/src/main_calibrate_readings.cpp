@@ -75,8 +75,6 @@ void calibrate_readings()
             sum += rbuf[i];
         // int avg = (sum + rbsz / 2) / rbsz;
 
-        int freq = tuner_val_to_freq(tuner);
-
         usleep(100000);
 
         ctx.clear();
@@ -93,8 +91,6 @@ void calibrate_readings()
         ctx.set_color(canvas_ity::fill_style, 0.8, 0.8, 0.8, 1);
         sprintf(buf, "Tuner %5d", tuner);
         ctx.fill_text(buf, 100, 100);
-        sprintf(buf, "Freq  %5d", freq);
-        ctx.fill_text(buf, 100, 164);
 
         sprintf(buf, "    A  %4d", aknob);
         ctx.fill_text(buf, 100, 228);
