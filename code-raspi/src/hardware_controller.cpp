@@ -58,7 +58,7 @@ void HardwareController::init()
     if ((file_i2c = open(filename, O_RDWR)) < 0)
     {
         deinit();
-        throwf_errno("Failed to open the I2C bus '%s'", filename);
+        THROWF_ERRNO("Failed to open the I2C bus '%s'", filename);
     }
 
     // Access
@@ -66,14 +66,14 @@ void HardwareController::init()
     if (ioctl(file_i2c, I2C_SLAVE, addr) < 0)
     {
         deinit();
-        throwf_errno("Failed to acquire I2C bus access");
+        THROWF_ERRNO("Failed to acquire I2C bus access");
     }
 
     int r = pthread_mutex_init(&mut, NULL);
     if (r != 0)
     {
         deinit();
-        throwf("Failed to initialize mutex: %d: %s", r, strerror(r));
+        THROWF("Failed to initialize mutex: %d: %s", r, strerror(r));
     }
 
     // Start worker thread
@@ -81,7 +81,7 @@ void HardwareController::init()
     if (r != 0)
     {
         deinit();
-        throwf("Failed to create thread: %d: %s", r, strerror(r));
+        THROWF("Failed to create thread: %d: %s", r, strerror(r));
     }
     pthread_detach(thread);
 }

@@ -47,7 +47,7 @@ static void print_stacktrace(std::string &trace)
     }
 }
 
-void throwf(const char *fmt, ...)
+void throwf(const char *file, int line, const char *func, const char *fmt, ...)
 {
     va_list args;
 
@@ -58,10 +58,10 @@ void throwf(const char *fmt, ...)
 
     std::string trace;
     print_stacktrace(trace);
-    throw igr_exception(buf, trace);
+    throw igr_exception(buf, file, line, func);
 }
 
-void throwf_errno(const char *fmt, ...)
+void throwf_errno(const char *file, int line, const char *func, const char *fmt, ...)
 {
     va_list args;
 
@@ -75,5 +75,5 @@ void throwf_errno(const char *fmt, ...)
 
     std::string trace;
     print_stacktrace(trace);
-    throw igr_exception(buf2, trace);
+    throw igr_exception(buf2, file, line, func);
 }

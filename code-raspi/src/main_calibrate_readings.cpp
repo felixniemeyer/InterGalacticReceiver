@@ -46,9 +46,6 @@ void calibrate_readings()
     char buf[64];
 
     font_data = load_canvas_font(&font_data_size);
-    if (font_data == nullptr)
-        throwf("Failed to load font; quitting");
-
     ctx.set_font(font_data, font_data_size, 64);
 
     while (true)

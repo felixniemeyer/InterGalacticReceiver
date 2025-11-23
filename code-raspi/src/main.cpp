@@ -15,7 +15,7 @@ int main(int argc, char *argv[])
     }
     catch (const igr_exception &e)
     {
-        fprintf(stderr, "Runtime error: %s\n%s\n", e.what(), e.stack_trace());
+        fprintf(stderr, "Runtime error in file %s line %d: %s:\n%s\n", e.file(), e.line(), e.func(), e.what());
         return -1;
     }
     catch (const std::bad_alloc &e)

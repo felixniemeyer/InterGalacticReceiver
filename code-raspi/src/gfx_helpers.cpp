@@ -25,7 +25,7 @@ void flush_to_fb(float *image)
 {
     int fb = open(FB_PATH, O_RDWR);
     if (fb < 0)
-        throwf_errno("Failed to open '%s'", FB_PATH);
+        THROWF_ERRNO("Failed to open '%s'", FB_PATH);
 
     struct fb_var_screeninfo vinfo;
     struct fb_fix_screeninfo finfo;
@@ -35,15 +35,15 @@ void flush_to_fb(float *image)
     // printf("Framebuffer size: %d x %d; bits per pixel: %d\n", vinfo.xres, vinfo.yres, vinfo.bits_per_pixel);
 
     if (vinfo.xres != W || vinfo.yres != H)
-        throwf("Framebuffer resolution (%d x %d) doesn't match image size of %d x %d", vinfo.xres, vinfo.yres, W, H);
+        THROWF("Framebuffer resolution (%d x %d) doesn't match image size of %d x %d", vinfo.xres, vinfo.yres, W, H);
 
     if (vinfo.bits_per_pixel != 16)
-        throwf("Expected 16 bits per pixel, got %d", vinfo.bits_per_pixel);
+        THROWF("Expected 16 bits per pixel, got %d", vinfo.bits_per_pixel);
 
     long screensize = vinfo.yres_virtual * finfo.line_length;
     char *fbp = (char *)mmap(0, screensize, PROT_READ | PROT_WRITE, MAP_SHARED, fb, 0);
     if (fbp == MAP_FAILED)
-        throwf_errno("Failed to map frame buffer to memory: %d: %s");
+        THROWF_ERRNO("Failed to map frame buffer to memory: %d: %s");
 
     for (int y = 0; y < H; ++y)
     {
@@ -74,7 +74,7 @@ uint8_t *load_file(const char *path, size_t *size_out)
 {
     FILE *f = fopen(path, "rb");
     if (!f)
-        throwf_errno("Failed to open '%s'", path);
+        THROWF_ERRNO("Failed to open '%s'", path);
 
     fseek(f, 0, SEEK_END);
     size_t size = ftell(f);
@@ -84,7 +84,7 @@ uint8_t *load_file(const char *path, size_t *size_out)
     if (!buf)
     {
         fclose(f);
-        throwf("Failed to allocated %lu bytes", size);
+        THROWF("Failed to allocate %lu bytes", size);
     }
 
     fread(buf, 1, size, f);
