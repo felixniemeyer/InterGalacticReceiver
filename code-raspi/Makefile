@@ -1,11 +1,13 @@
 MAKEFLAGS += -j3 # parallel processes
-CXX = g++
+CXX				= g++
 CXX_FLAGS = -std=c++11 -Wall -O3 -march=native -funroll-loops -fstrict-aliasing
+INCLUDES 	= -I/usr/include/drm -I/usr/include/libdrm
+LIBS     	= -lEGL -lGLESv2 -lgbm -ldrm -lpthread -lm
 
-BIN = igr
-SRC_DIR = ./src
-BIN_DIR = ./bin
-OUT_DIR = ./out
+BIN 			= igr
+SRC_DIR 	= ./src
+BIN_DIR 	= ./bin
+OUT_DIR 	= ./out
 
 # Source files
 CPP = $(wildcard $(SRC_DIR)/*.cpp)
@@ -22,7 +24,7 @@ $(BIN) : $(BIN_DIR)/$(BIN)
 # Link binary
 $(BIN_DIR)/$(BIN) : $(OBJ)
 	mkdir -p $(@D)
-	$(CXX) $(CXX_FLAGS) $^ -o $@
+	$(CXX) $(CXX_FLAGS) $^ -o $@ $(LIBS)
 
 # Include all .d files
 -include $(DEP)
@@ -30,7 +32,7 @@ $(BIN_DIR)/$(BIN) : $(OBJ)
 # Compile source to object (and generate dependency file)
 $(OUT_DIR)/%.o: $(SRC_DIR)/%.cpp
 	mkdir -p $(@D)
-	$(CXX) $(CXX_FLAGS) -MMD -c $< -o $@
+	$(CXX) $(CXX_FLAGS) $(INCLUDES) -MMD -c $< -o $@
 
 .PHONY : clean
 clean :
