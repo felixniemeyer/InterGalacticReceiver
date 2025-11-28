@@ -43,7 +43,7 @@ void flush_to_fb(float *image)
     long screensize = vinfo.yres_virtual * finfo.line_length;
     char *fbp = (char *)mmap(0, screensize, PROT_READ | PROT_WRITE, MAP_SHARED, fb, 0);
     if (fbp == MAP_FAILED)
-        THROWF_ERRNO("Failed to map frame buffer to memory: %d: %s");
+        THROWF_ERRNO("Failed to map frame buffer to memory");
 
     for (int y = 0; y < H; ++y)
     {

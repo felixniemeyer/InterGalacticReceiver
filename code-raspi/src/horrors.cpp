@@ -1,11 +1,14 @@
 #include "horrors.h"
 
-#include <unistd.h>
+// Local dependencies
+#include "error.h"
 
+// Global
 #include <csignal>
 #include <cstdio>
 #include <cstdlib>
 #include <fcntl.h>
+#include <unistd.h>
 
 int drm_fd = -1;
 drmModeRes *resources = nullptr;
@@ -21,18 +24,6 @@ EGLSurface egl_surf = EGL_NO_SURFACE;
 gbm_bo *bo = nullptr;
 uint32_t fb_id = 0;
 uint32_t prev_fb_id = 0;
-
-void exit_with_cleanup(int status)
-{
-    cleanup_horrors();
-    exit(status);
-}
-
-void die(const char *fun)
-{
-    fprintf(stderr, "Function call failed: %s\n", fun);
-    exit_with_cleanup(1);
-}
 
 void cleanup_horrors()
 {
@@ -117,9 +108,8 @@ static drmModeConnectorPtr get_preferred_connector()
         return first_connector;
     }
 
-    fprintf(stderr, "No connector found\n");
-    exit_with_cleanup(1);
-    return nullptr;
+    THROWF("No suitable DRM connector found");
+    return nullptr; // Shut up compiler
 }
 
 static drmModeModeInfo get_first_or_preferred_mode()
@@ -140,8 +130,10 @@ static drmModeModeInfo get_first_or_preferred_mode()
 static void init_egl()
 {
     egl_display = eglGetDisplay((EGLNativeDisplayType)gbm_dev);
-    if (egl_display == EGL_NO_DISPLAY) die("eglGetDisplay");
-    if (!eglInitialize(egl_display, nullptr, nullptr)) die("eglInitialize");
+    if (egl_display == EGL_NO_DISPLAY)
+        THROWF("eglGetDisplay failed: %d", eglGetError());
+    if (!eglInitialize(egl_display, nullptr, nullptr))
+        THROWF("eglInitialize failed: %d", eglGetError());
 
     EGLint cfg_attribs[] = {
         EGL_SURFACE_TYPE, EGL_WINDOW_BIT,
@@ -154,16 +146,18 @@ static void init_egl()
         EGL_NONE};
     EGLConfig cfg;
     EGLint num_cfg;
-    if (!eglChooseConfig(egl_display, cfg_attribs, &cfg, 1, &num_cfg) || num_cfg < 1) die("eglChooseConfig");
+    if (!eglChooseConfig(egl_display, cfg_attribs, &cfg, 1, &num_cfg) || num_cfg < 1)
+        THROWF("eglChooseConfig failed: %d", eglGetError());
 
     EGLint ctx_attribs[] = {EGL_CONTEXT_CLIENT_VERSION, 2, EGL_NONE};
     egl_ctx = eglCreateContext(egl_display, cfg, EGL_NO_CONTEXT, ctx_attribs);
-    if (egl_ctx == EGL_NO_CONTEXT) die("eglCreateContext");
+    if (egl_ctx == EGL_NO_CONTEXT) THROWF("eglCreateContext failed: %d", eglGetError());
 
     egl_surf = eglCreateWindowSurface(egl_display, cfg, (EGLNativeWindowType)gbm_surf, nullptr);
-    if (egl_surf == EGL_NO_SURFACE) die("eglCreateWindowSurface");
+    if (egl_surf == EGL_NO_SURFACE) THROWF("eglCreateWindowSurface failed: %d", eglGetError());
 
-    if (!eglMakeCurrent(egl_display, egl_surf, egl_surf, egl_ctx)) die("eglMakeCurrent");
+    if (!eglMakeCurrent(egl_display, egl_surf, egl_surf, egl_ctx))
+        THROWF("eglMakeCurrent failed: %d", eglGetError());
 }
 
 static void set_crtc(drmModeModeInfo mode, uint32_t fb_id)
@@ -173,28 +167,20 @@ static void set_crtc(drmModeModeInfo mode, uint32_t fb_id)
     if (enc && enc->crtc_id) crtc_id = enc->crtc_id;
     else if (resources->count_crtcs > 0) crtc_id = resources->crtcs[0];
 
-    if (!crtc_id)
-    {
-        fprintf(stderr, "No available CRTC\n");
-        exit_with_cleanup(1);
-    }
+    if (!crtc_id) THROWF("No available CRTC");
 
     int ret = drmModeSetCrtc(drm_fd, crtc_id, fb_id, 0, 0, &conn->connector_id, 1, &mode);
-    if (ret) die("drmModeSetCrtc");
+    if (ret) THROWF_ERRNO("drmModeSetCrtc failed");
 }
 
 void init_horrors(const char *devicePath)
 {
-    printf("Device: %s\n", devicePath);
+    printf("Initializing video device: %s\n", devicePath);
     drm_fd = open(devicePath, O_RDWR | O_CLOEXEC);
-    if (drm_fd < 0)
-    {
-        fprintf(stderr, "Failed to open device '%s'\n", devicePath);
-        exit_with_cleanup(1);
-    }
+    if (drm_fd < 0) THROWF_ERRNO("Failed to open device '%s'", devicePath);
 
     resources = drmModeGetResources(drm_fd);
-    if (!resources) die("drmModeGetResources");
+    if (!resources) THROWF_ERRNO("drmModeGetResources failed");
 
     conn = get_preferred_connector();
     if (conn->encoder_id) enc = drmModeGetEncoder(drm_fd, conn->encoder_id);
@@ -207,14 +193,14 @@ void init_horrors(const char *devicePath)
 
     // GBM device and surface
     gbm_dev = gbm_create_device(drm_fd);
-    if (!gbm_dev) die("gbm_create_device");
+    if (!gbm_dev) THROWF("gbm_create_device failed");
 
     gbm_surf = gbm_surface_create(gbm_dev,
                                   mode.hdisplay,
                                   mode.vdisplay,
                                   GBM_FORMAT_XRGB8888,
                                   GBM_BO_USE_SCANOUT | GBM_BO_USE_RENDERING);
-    if (!gbm_surf) die("gbm_surface_create");
+    if (!gbm_surf) THROWF("gbm_surface_create failed");
 
     // EGL init
     init_egl();
@@ -223,11 +209,12 @@ void init_horrors(const char *devicePath)
 void put_on_screen()
 {
     // Swap EGL buffers
-    if (!eglSwapBuffers(egl_display, egl_surf)) die("eglSwapBuffers");
+    if (!eglSwapBuffers(egl_display, egl_surf))
+        THROWF("eglSwapBuffers failed: %d", eglGetError());
 
     // Get new buffer
     gbm_bo *new_bo = gbm_surface_lock_front_buffer(gbm_surf);
-    if (!new_bo) die("gbm_surface_lock_front_buffer");
+    if (!new_bo) THROWF("gbm_surface_lock_front_buffer failed");
 
     uint32_t width = gbm_bo_get_width(new_bo);
     uint32_t height = gbm_bo_get_height(new_bo);
@@ -242,7 +229,7 @@ void put_on_screen()
     if (drmModeAddFB2(drm_fd, width, height, GBM_FORMAT_XRGB8888,
                       handles, pitches, offsets, &new_fb_id, 0))
     {
-        die("drmModeAddFB2");
+        THROWF_ERRNO("drmModeAddFB2 failed");
     }
 
     // Set new framebuffer before releasing old buffer
