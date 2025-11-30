@@ -21,8 +21,6 @@ extern EGLSurface egl_surf;
 extern gbm_bo *bo;
 extern uint32_t fb_id, prev_fb_id;
 
-void exit_with_cleanup(int status);
-void die(const char *fun);
 void init_horrors(const char *devicePath);
 void put_on_screen();
 void cleanup_horrors();
