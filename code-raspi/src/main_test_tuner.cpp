@@ -44,6 +44,11 @@ void test_tuner()
         sprintf(buf, "Freq  %5.1f", freq);
         ctx.fill_text(buf, 100, 164);
 
+        const int vm = 4, hm = 46;
+        ctx.set_line_width(2.0f);
+        ctx.set_color(canvas_ity::stroke_style, 1, 0.3, 0.3, 1);
+        ctx.stroke_rectangle(hm, vm, W - 2 * hm, H - 2 * vm);
+
         int station_ix;
         TuneStatus tuner_status;
         tuner.get_status(station_ix, tuner_status);
