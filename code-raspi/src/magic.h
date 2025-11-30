@@ -6,7 +6,6 @@
 #define W                     720
 #define H                     576
 #define TARGET_FPS            50
-#define DEFAULT_DEVICE_PATH   "/dev/dri/card0"
 #define FB_PATH               "/dev/fb0"
 #define I2C_NODE              "/dev/i2c-1"
 #define SLAVE_ADDRESS         0x50

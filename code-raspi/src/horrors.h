@@ -21,7 +21,8 @@ extern EGLSurface egl_surf;
 extern gbm_bo *bo;
 extern uint32_t fb_id, prev_fb_id;
 
-void init_horrors(const char *devicePath);
+char *find_display_device();
+void init_horrors(const char *device_path);
 void put_on_screen();
 void cleanup_horrors();
 

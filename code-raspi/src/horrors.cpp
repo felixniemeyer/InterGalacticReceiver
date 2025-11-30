@@ -7,6 +7,8 @@
 #include <csignal>
 #include <cstdio>
 #include <cstdlib>
+#include <cstring>
+#include <dirent.h>
 #include <fcntl.h>
 #include <unistd.h>
 
@@ -173,11 +175,11 @@ static void set_crtc(drmModeModeInfo mode, uint32_t fb_id)
     if (ret) THROWF_ERRNO("drmModeSetCrtc failed");
 }
 
-void init_horrors(const char *devicePath)
+void init_horrors(const char *device_path)
 {
-    printf("Initializing video device: %s\n", devicePath);
-    drm_fd = open(devicePath, O_RDWR | O_CLOEXEC);
-    if (drm_fd < 0) THROWF_ERRNO("Failed to open device '%s'", devicePath);
+    printf("Initializing video device: %s\n", device_path);
+    drm_fd = open(device_path, O_RDWR | O_CLOEXEC);
+    if (drm_fd < 0) THROWF_ERRNO("Failed to open device '%s'", device_path);
 
     resources = drmModeGetResources(drm_fd);
     if (!resources) THROWF_ERRNO("drmModeGetResources failed");
@@ -204,6 +206,58 @@ void init_horrors(const char *devicePath)
 
     // EGL init
     init_egl();
+}
+
+static bool card_has_active_connector(const char *card)
+{
+    int fd = open(card, O_RDWR | O_CLOEXEC);
+    if (fd < 0) return false;
+
+    drmModeRes *res = drmModeGetResources(fd);
+    if (!res)
+    {
+        close(fd);
+        return false;
+    }
+
+    bool ok = false;
+    for (int i = 0; !ok && i < res->count_connectors; i++)
+    {
+        drmModeConnector *conn = drmModeGetConnector(fd, res->connectors[i]);
+        if (!conn) continue;
+        if ((conn->connection == DRM_MODE_CONNECTED || conn->connection == DRM_MODE_UNKNOWNCONNECTION) &&
+            conn->count_modes > 0)
+        {
+            ok = true;
+        }
+        drmModeFreeConnector(conn);
+    }
+    drmModeFreeResources(res);
+    close(fd);
+    return ok;
+}
+
+char *find_display_device()
+{
+    const char *dri_dir = "/dev/dri";
+    DIR *dir = opendir(dri_dir);
+    if (!dir) return nullptr;
+
+    struct dirent *entry;
+    while ((entry = readdir(dir)) != NULL)
+    {
+        if (strncmp(entry->d_name, "card", 4) != 0) continue;
+        std::string path = std::string(dri_dir) + "/" + entry->d_name;
+        if (card_has_active_connector(path.c_str()))
+        {
+            char *res = new char[path.size() + 1];
+            strcpy(res, path.c_str());
+            closedir(dir);
+            return res;
+        }
+    }
+    closedir(dir);
+    return nullptr;
 }
 
 void put_on_screen()

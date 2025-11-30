@@ -18,7 +18,7 @@ bool app_running = true;
 #define ACT_RUN         "action_run"
 // clang-format on
 
-static std::string device_path = DEFAULT_DEVICE_PATH;
+static std::string device_path;
 static std::string action;
 
 static void sighandler(int);
@@ -26,12 +26,18 @@ static bool parse_args(int argc, const char *argv[]);
 
 int main(int argc, const char *argv[])
 {
+
     try
     {
         signal(SIGINT, sighandler);
         signal(SIGTERM, sighandler);
 
         if (!parse_args(argc, argv)) return -1;
+
+        const char *found_device = find_display_device();
+        if (found_device == nullptr) THROWF("No connected display device found");
+        device_path.assign(found_device);
+        delete[] found_device;
 
         if (action == ACT_CALIBRATE) calibrate_readings();
         else if (action == ACT_TUNER) test_tuner();
