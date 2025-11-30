@@ -15,6 +15,11 @@ sudo nmcli connection modify "Schnauze" wifi-sec.key-mgmt wpa-psk wifi-sec.psk "
 
 To connect: sudo nmcli connection up "Schnauze"
 
+Disable on-screen login prompt:
+sudo systemctl disable getty@tty1.service
+sudo systemctl stop getty@tty1.service
+
+
 (1) Composite display
 ==========================================
 
@@ -58,3 +63,36 @@ git config --global user.name "xx_NAME_xx"
 git config --global user.email "you@example.com"
 
 Build & run
+
+
+(4) Splash screen service for funsies
+==========================================
+
+sudo apt install fbi
+sudo usermod -aG video gabor
+
+=> fbi -d /dev/fb0 -a -noverbose rt-05.jpg
+
+sudo nano /etc/systemd/system/startupsplash.service
+==>
+[Unit]
+Description=Startup Splash Screen
+After=network.target
+
+[Service]
+ExecStart=/opt/splash/splash.sh
+WorkingDirectory=/opt/splash
+StandardOutput=inherit
+StandardError=inherit
+Restart=always
+User=root
+
+[Install]
+WantedBy=multi-user.target
+<==
+
+sudo systemctl daemon-reload
+sudo systemctl enable startupsplash.service
+sudo systemctl start startupsplash.service
+
+
