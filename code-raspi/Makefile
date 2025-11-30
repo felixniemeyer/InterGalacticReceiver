@@ -1,7 +1,7 @@
 MAKEFLAGS += -j3 # parallel processes
 CXX				= g++
 CXX_FLAGS = -std=c++11 -Wall -O3 -march=native -funroll-loops -fstrict-aliasing
-INCLUDES 	= -I/usr/include/drm -I/usr/include/libdrm
+INCLUDES 	= -I/usr/include/drm -I/usr/include/libdrm -Isrc/sketches -Isrc
 LIBS     	= -lEGL -lGLESv2 -lgbm -ldrm -lpthread -lm
 
 BIN 			= igr
@@ -10,7 +10,10 @@ BIN_DIR 	= ./bin
 OUT_DIR 	= ./out
 
 # Source files
-CPP = $(wildcard $(SRC_DIR)/*.cpp)
+# CPP = $(wildcard $(SRC_DIR)/*.cpp)
+CPP = $(wildcard $(SRC_DIR)/*.cpp) \
+			$(wildcard $(SRC_DIR)/sketches/*.cpp) \
+			$(wildcard $(SRC_DIR)/sketches/star/*.cpp)
 
 # All .o files go to build dir
 OBJ = $(patsubst $(SRC_DIR)/%.cpp, $(OUT_DIR)/%.o, $(CPP))

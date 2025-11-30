@@ -3,12 +3,14 @@
 
 // clang-format off
 
-#define W                   720
-#define H                   576
-#define FB_PATH             "/dev/fb0"
-#define I2C_NODE            "/dev/i2c-1"
-#define SLAVE_ADDRESS       0x50
-#define HWCTRL_CYCLE_MSEC   20
+#define W                     720
+#define H                     576
+#define TARGET_FPS            50
+#define DEFAULT_DEVICE_PATH   "/dev/dri/card0"
+#define FB_PATH               "/dev/fb0"
+#define I2C_NODE              "/dev/i2c-1"
+#define SLAVE_ADDRESS         0x50
+#define HWCTRL_CYCLE_MSEC     20
 
 // clang-format on
 

@@ -4,6 +4,7 @@
 #include "arg_parse.h"
 #include "error.h"
 #include "horrors.h"
+#include "magic.h"
 
 // Global
 #include <csignal>
@@ -17,7 +18,7 @@ bool app_running = true;
 #define ACT_RUN         "action_run"
 // clang-format on
 
-static std::string device_path = "/dev/dri/card0";
+static std::string device_path = DEFAULT_DEVICE_PATH;
 static std::string action;
 
 static void sighandler(int);
@@ -40,6 +41,7 @@ int main(int argc, const char *argv[])
             main_icr();
             cleanup_horrors();
         }
+        printf("\nGoodbye!\n");
         return 0;
     }
     catch (const igr_exception &e)
