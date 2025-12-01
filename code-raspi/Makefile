@@ -36,6 +36,10 @@ $(OUT_DIR)/%.o: $(SRC_DIR)/%.cpp
 	mkdir -p $(@D)
 	$(CXX) $(CXX_FLAGS) $(INCLUDES) -MMD -c $< -o $@
 
+# Build shader.h files with embedded shaders
+shaders: 
+	$(MAKE) -C src/sketches
+
 .PHONY : clean
 clean :
 	rm -rf -- $(OUT_DIR) $(BIN_DIR)/$(BIN)

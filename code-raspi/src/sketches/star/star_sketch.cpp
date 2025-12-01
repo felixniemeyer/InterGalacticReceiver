@@ -17,8 +17,8 @@ StarSketch::StarSketch(int w, int h)
 void StarSketch::init()
 {
     // Compile shaders
-    vs = compile_shader(GL_VERTEX_SHADER, vert_glsl);
-    fs = compile_shader(GL_FRAGMENT_SHADER, frag_glsl);
+    vs = compile_shader(GL_VERTEX_SHADER, star_vert);
+    fs = compile_shader(GL_FRAGMENT_SHADER, star_frag);
 
     // Link program, with a_pos attribute
     prog = glCreateProgram();
