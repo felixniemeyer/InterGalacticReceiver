@@ -2,7 +2,7 @@
 #define STAR_SHADERS_H
 
 constexpr const char *star_vert = R"(
-SRC sh_out_vert.glsl
+SRC ../sweep_vert.glsl
 )";
 
 constexpr const char *star_frag = R"(
