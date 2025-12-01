@@ -39,9 +39,6 @@ void StarSketch::init()
 
     // Array buffer and vertex array
     glGenBuffers(1, &vbo);
-
-    // Vertex shader's two fixed triangles
-    quad.assign({-1, -1, 1, -1, -1, 1, -1, 1, 1, -1, 1, 1});
 }
 
 void StarSketch::frame(double dt)

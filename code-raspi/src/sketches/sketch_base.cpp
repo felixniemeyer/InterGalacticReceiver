@@ -6,6 +6,12 @@
 // Global
 #include <memory>
 
+SketchBase::SketchBase()
+{
+    // "Sweep" vertex shader's two fixed triangles
+    quad.assign({-1, -1, 1, -1, -1, 1, -1, 1, 1, -1, 1, 1});
+}
+
 GLuint SketchBase::compile_shader(GLenum type, const char *src)
 {
     GLuint s = glCreateShader(type);

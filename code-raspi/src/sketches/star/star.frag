@@ -10,7 +10,6 @@ vec2 uv(){ return (gl_FragCoord.xy / resolution * 2.0 - 1.0) * vec2(resolution.x
 float rand(const in float n){return fract(sin(n) * 1e4);}
 float rand(const in vec2 n) { return fract(1e4 * sin(17.0 * n.x + n.y * 0.1) * (0.1 + abs(sin(n.y * 13.0 + n.x))));
 }
-
 float noise(float x) {
     float i = floor(x);
     float f = fract(x);

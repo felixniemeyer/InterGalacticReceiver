@@ -12,7 +12,6 @@ class StarSketch : public SketchBase
     GLuint fs = 0;
     GLuint prog = 0;
     GLuint vbo = 0;
-    std::vector<GLfloat> quad;
     double time;
 
   public:
