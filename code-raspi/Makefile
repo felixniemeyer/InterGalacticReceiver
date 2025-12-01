@@ -10,10 +10,9 @@ BIN_DIR 	= ./bin
 OUT_DIR 	= ./out
 
 # Source files
-# CPP = $(wildcard $(SRC_DIR)/*.cpp)
 CPP = $(wildcard $(SRC_DIR)/*.cpp) \
 			$(wildcard $(SRC_DIR)/sketches/*.cpp) \
-			$(wildcard $(SRC_DIR)/sketches/star/*.cpp)
+			$(wildcard $(SRC_DIR)/sketches/**/*.cpp)
 
 # All .o files go to build dir
 OBJ = $(patsubst $(SRC_DIR)/%.cpp, $(OUT_DIR)/%.o, $(CPP))
