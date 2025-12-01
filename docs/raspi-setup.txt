@@ -64,6 +64,7 @@ git config --global user.email "you@example.com"
 
 Build & run
 
+For shader syntax hilighting with GLSL Lint: install glslang
 
 (4) Splash screen service for funsies
 ==========================================
