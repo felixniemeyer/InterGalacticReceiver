@@ -27,7 +27,7 @@ static GLuint render_vbo = 0;
 static void init_render_target();
 static void compile_render_prog();
 static void init_stations();
-static void render();
+static void render(double time);
 
 void main_icr()
 {
@@ -41,7 +41,7 @@ void main_icr()
         double current_time = fps.frame_start();
         double dt = current_time - last_time;
         sketches[sketch_ix]->frame(dt);
-        render();
+        render(current_time);
         put_on_screen();
         fps.frame_end();
     }
@@ -86,7 +86,7 @@ void compile_render_prog()
 {
     // Compile shaders
     auto vs = SketchBase::compile_shader(GL_VERTEX_SHADER, sweep_vert);
-    auto fs = SketchBase::compile_shader(GL_FRAGMENT_SHADER, render_frag);
+    auto fs = SketchBase::compile_shader(GL_FRAGMENT_SHADER, static_frag); // render_frag
 
     // Link program, with position attribute
     render_prog = glCreateProgram();
@@ -108,7 +108,7 @@ void compile_render_prog()
     glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * quad.size(), &quad[0], GL_STATIC_DRAW);
 }
 
-void render()
+void render(double time)
 {
     glUseProgram(render_prog);
 
@@ -117,9 +117,11 @@ void render()
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
 
     GLint tex_loc = glGetUniformLocation(render_prog, "tex");
+    GLint time_loc = glGetUniformLocation(render_prog, "time");
     GLint resolution_loc = glGetUniformLocation(render_prog, "resolution");
 
     glUniform1i(tex_loc, 0);
+    glUniform1f(time_loc, (float)time);
     glUniform2f(resolution_loc, (float)W, (float)H);
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);

@@ -2,11 +2,15 @@
 #define BASE_SHADERS_H
 
 constexpr const char *sweep_vert = R"(
-SRC sweep.vert
+SRC ./sh_sweep.vert
 )";
 
 constexpr const char *render_frag = R"(
-SRC render.frag
+SRC ./sh_render.frag
+)";
+
+constexpr const char *static_frag = R"(
+SRC ./sh_static.frag
 )";
 
 #endif
