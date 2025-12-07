@@ -8,6 +8,7 @@ class StarSketch : public SketchBase
 {
   private:
     const int w, h;
+    const GLuint render_fbo;
     GLuint vs = 0;
     GLuint fs = 0;
     GLuint prog = 0;
@@ -15,7 +16,7 @@ class StarSketch : public SketchBase
     double time;
 
   public:
-    StarSketch(int w, int h);
+    StarSketch(int w, int h, GLuint render_fbo);
     void init() override;
     void frame(double dt) override;
     void unload() override;

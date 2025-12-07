@@ -7,9 +7,10 @@
 
 // Global
 
-StarSketch::StarSketch(int w, int h)
+StarSketch::StarSketch(int w, int h, GLuint render_fbo)
     : w(w)
     , h(h)
+    , render_fbo(render_fbo)
     , time(0)
 {
 }
@@ -20,7 +21,7 @@ void StarSketch::init()
     vs = compile_shader(GL_VERTEX_SHADER, star_vert);
     fs = compile_shader(GL_FRAGMENT_SHADER, star_frag);
 
-    // Link program, with a_pos attribute
+    // Link program, with position attribute
     prog = glCreateProgram();
     glAttachShader(prog, vs);
     glAttachShader(prog, fs);
@@ -37,7 +38,7 @@ void StarSketch::init()
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
 
-    // Array buffer and vertex array
+    // Array buffer: for vertex array
     glGenBuffers(1, &vbo);
 }
 
@@ -59,6 +60,7 @@ void StarSketch::frame(double dt)
     glUniform1f(time_loc, (float)(time * 0.001));
     glUniform2f(resolution_loc, (float)w, (float)h);
 
+    glBindFramebuffer(GL_FRAMEBUFFER, render_fbo);
     glViewport(0, 0, w, h);
     glClearColor(0, 0, 0, 1);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

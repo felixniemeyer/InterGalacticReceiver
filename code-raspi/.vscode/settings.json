@@ -53,7 +53,12 @@
     "text_encoding": "cpp",
     "typeinfo": "cpp",
     "variant": "cpp",
-    "cstring": "cpp"
+    "cstring": "cpp",
+    "csignal": "cpp",
+    "list": "cpp",
+    "map": "cpp",
+    "iostream": "cpp",
+    "cinttypes": "cpp"
   },
   "editor.formatOnSave": true
 }

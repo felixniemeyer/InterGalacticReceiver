@@ -9,6 +9,11 @@
 SketchBase::SketchBase()
 {
     // "Sweep" vertex shader's two fixed triangles
+    fill_quad(quad);
+}
+
+void SketchBase::fill_quad(std::vector<GLfloat> &quad)
+{
     quad.assign({-1, -1, 1, -1, -1, 1, -1, 1, 1, -1, 1, 1});
 }
 

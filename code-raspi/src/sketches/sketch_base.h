@@ -7,9 +7,12 @@
 class SketchBase
 {
   protected:
+    std::vector<GLfloat> quad;
+
+  public:
     static GLuint compile_shader(GLenum type, const char *src);
     static void throw_shader_link_error(GLuint prog);
-    std::vector<GLfloat> quad;
+    static void fill_quad(std::vector<GLfloat> &quad);
 
   public:
     SketchBase();
