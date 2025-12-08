@@ -5,6 +5,8 @@ constexpr const char *mmgl01_frag = R"(
 #version 310 es
 precision highp float;
 
+// https://www.shadertoy.com/view/lX3XWl
+
 uniform float time;
 uniform vec2 resolution;
 out vec4 fragColor;

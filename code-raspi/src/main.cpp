@@ -44,7 +44,7 @@ int main(int argc, const char *argv[])
         else if (action == ACT_RUN)
         {
             init_horrors(device_path.c_str());
-            main_icr();
+            main_igr();
             cleanup_horrors();
         }
         printf("\nGoodbye!\n");

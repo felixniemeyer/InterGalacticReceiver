@@ -8,6 +8,6 @@ extern bool app_running;
 int main(int argc, const char *argv[]);
 void calibrate_readings();
 void test_tuner();
-void main_icr();
+void main_igr();
 
 #endif

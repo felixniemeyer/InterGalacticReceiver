@@ -30,7 +30,7 @@ static void compile_render_prog();
 static void init_stations();
 static void render(double time);
 
-void main_icr()
+void main_igr()
 {
     init_render_target();
     compile_render_prog();
