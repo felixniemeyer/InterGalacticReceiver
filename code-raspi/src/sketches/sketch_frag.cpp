@@ -6,6 +6,7 @@
 #include "shaders.h"
 
 // Global
+#include <cstdio>
 
 FragSketch::FragSketch(int w, int h, GLuint render_fbo, const char *frag)
     : w(w)
@@ -58,7 +59,7 @@ void FragSketch::frame(double dt)
     GLint time_loc = glGetUniformLocation(prog, "time");
     GLint resolution_loc = glGetUniformLocation(prog, "resolution");
 
-    glUniform1f(time_loc, (float)(time * 0.001));
+    glUniform1f(time_loc, (float)time);
     glUniform2f(resolution_loc, (float)w, (float)h);
 
     glBindFramebuffer(GL_FRAMEBUFFER, render_fbo);

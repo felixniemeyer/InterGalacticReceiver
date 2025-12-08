@@ -41,6 +41,7 @@ void main_igr()
     {
         double current_time = fps.frame_start();
         double dt = current_time - last_time;
+        last_time = current_time;
         sketches[sketch_ix]->frame(dt);
         render(current_time);
         put_on_screen();
@@ -58,7 +59,7 @@ void init_stations()
     mmgl01_sketch->init();
     sketches.push_back(mmgl01_sketch);
 
-    sketch_ix = 1;
+    sketch_ix = 0;
 }
 
 void init_render_target()
@@ -92,7 +93,7 @@ void compile_render_prog()
 {
     // Compile shaders
     auto vs = SketchBase::compile_shader(GL_VERTEX_SHADER, sweep_vert);
-    auto fs = SketchBase::compile_shader(GL_FRAGMENT_SHADER, static_frag); // render_frag
+    auto fs = SketchBase::compile_shader(GL_FRAGMENT_SHADER, render_frag); // render_frag
 
     // Link program, with position attribute
     render_prog = glCreateProgram();
