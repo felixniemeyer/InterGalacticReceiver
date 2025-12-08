@@ -1,3 +1,14 @@
+The animations in the subfolders of `code-raspi/src/sketches` are (C) their
+respective authors.
+
+The content under `docs` is (C) Gábor L Ugray, released under CC BY-NC-SA 4.0.
+
+The content under `references` is (C) of the the datasheets' respective publishers.
+These files are included here for convenience and archival purposes only.
+
+All other code and design files in this repository: the author, Gabor L Ugray, releases
+these to the commons under the WTFPL, which is as follows.
+
            DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE
                    Version 2, December 2004
  
