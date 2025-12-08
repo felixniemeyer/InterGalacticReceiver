@@ -10,6 +10,7 @@
 #include "tuner.h"
 
 // Sketches
+#include "sketches/mmgl01/mmgl01_sketch.h"
 #include "sketches/star/star_sketch.h"
 
 // Global
@@ -52,7 +53,12 @@ void init_stations()
     auto star_sketch = new StarSketch(W, H, render_fbo);
     star_sketch->init();
     sketches.push_back(star_sketch);
-    sketch_ix = 0;
+
+    auto mmgl01_sketch = new MMGL01Sketch(W, H, render_fbo);
+    mmgl01_sketch->init();
+    sketches.push_back(mmgl01_sketch);
+
+    sketch_ix = 1;
 }
 
 void init_render_target()
