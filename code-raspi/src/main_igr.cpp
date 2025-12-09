@@ -3,10 +3,11 @@
 // Local dependencies
 #include "error.h"
 #include "fps.h"
+#include "hardware_controller.h"
 #include "horrors.h"
 #include "magic.h"
+#include "render_blender.h"
 #include "sketch_base.h"
-#include "sketches/shaders.h"
 #include "tuner.h"
 
 // Sketches
@@ -16,125 +17,73 @@
 // Global
 #include <vector>
 
-static Tuner tuner;
+static Tuner tuner(false);
 static std::vector<SketchBase *> sketches;
 static int sketch_ix = -1;
-static GLuint render_tex = 0;
-static GLuint render_depth = 0;
-static GLuint render_fbo = 0;
-static GLuint render_prog = 0;
-static GLuint render_vbo = 0;
 
-static void init_render_target();
-static void compile_render_prog();
-static void init_stations();
-static void render(double time);
+static void init_stations(GLuint render_fbo);
+static void update_station(RenderBlender &renderer, double current_time);
 
 void main_igr()
 {
-    init_render_target();
-    compile_render_prog();
-    init_stations();
+    RenderBlender renderer;
+    init_stations(renderer.fbo());
+
+    HardwareController::set_listeners(&tuner);
+    HardwareController::init();
+
     FPS fps(TARGET_FPS);
     double last_time = fps.frame_start();
+
     while (app_running)
     {
         double current_time = fps.frame_start();
         double dt = current_time - last_time;
         last_time = current_time;
+
+        update_station(renderer, current_time);
+        if (sketch_ix == -1) continue;
+
         sketches[sketch_ix]->frame(dt);
-        render(current_time);
+        renderer.render(current_time);
         put_on_screen();
         fps.frame_end();
     }
 }
 
-void init_stations()
+template <typename T>
+void add_station(GLuint render_fbo, int freq)
 {
-    auto star_sketch = new StarSketch(W, H, render_fbo);
-    star_sketch->init();
-    sketches.push_back(star_sketch);
-
-    auto mmgl01_sketch = new MMGL01Sketch(W, H, render_fbo);
-    mmgl01_sketch->init();
-    sketches.push_back(mmgl01_sketch);
-
-    sketch_ix = 0;
+    auto sketch = new T(W, H, render_fbo);
+    sketch->init();
+    tuner.add_station(freq);
+    sketches.push_back(sketch);
 }
 
-void init_render_target()
+void init_stations(GLuint render_fbo)
 {
-    // Texture
-    glGenTextures(1, &render_tex);
-    glBindTexture(GL_TEXTURE_2D, render_tex);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, W, H, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-    // Framebuffer and attach texture
-    glGenFramebuffers(1, &render_fbo);
-    glBindFramebuffer(GL_FRAMEBUFFER, render_fbo);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, render_tex, 0);
-
-    // Depth buffer
-    glGenRenderbuffers(1, &render_depth);
-    glBindRenderbuffer(GL_RENDERBUFFER, render_depth);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, W, H);
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, render_depth);
-
-    GLenum res = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-    if (res != GL_FRAMEBUFFER_COMPLETE)
-        THROWF("Render target FBO failed to build: 0x%04X", (int)res);
-
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    add_station<StarSketch>(render_fbo, 980);
+    add_station<MMGL01Sketch>(render_fbo, 967);
 }
 
-void compile_render_prog()
+void update_station(RenderBlender &renderer, double current_time)
 {
-    // Compile shaders
-    auto vs = SketchBase::compile_shader(GL_VERTEX_SHADER, sweep_vert);
-    auto fs = SketchBase::compile_shader(GL_FRAGMENT_SHADER, render_frag); // render_frag
+    int station_ix;
+    TuneStatus tuner_status;
+    tuner.get_status(station_ix, tuner_status);
 
-    // Link program, with position attribute
-    render_prog = glCreateProgram();
-    glAttachShader(render_prog, vs);
-    glAttachShader(render_prog, fs);
-    const GLint ixPosAttribute = 0;
-    glBindAttribLocation(render_prog, ixPosAttribute, "position");
-    glLinkProgram(render_prog);
-    GLint ok = 0;
-    glGetProgramiv(render_prog, GL_LINK_STATUS, &ok);
-    if (!ok) SketchBase::throw_shader_link_error(render_prog);
+    if (station_ix < -1) return;
 
-    // Array buffer: for vertex array
-    std::vector<GLfloat> quad;
-    SketchBase::fill_quad(quad);
+    if (station_ix != sketch_ix && sketch_ix != -1)
+    {
+        sketches[sketch_ix]->unload(current_time);
+        sketches[station_ix]->reload(current_time);
+    }
+    sketch_ix = station_ix;
 
-    glGenBuffers(1, &render_vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, render_vbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * quad.size(), &quad[0], GL_STATIC_DRAW);
-}
-
-void render(double time)
-{
-    glUseProgram(render_prog);
-
-    glBindBuffer(GL_ARRAY_BUFFER, render_vbo);
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
-
-    GLint tex_loc = glGetUniformLocation(render_prog, "tex");
-    GLint time_loc = glGetUniformLocation(render_prog, "time");
-    GLint resolution_loc = glGetUniformLocation(render_prog, "resolution");
-
-    glUniform1i(tex_loc, 0);
-    glUniform1f(time_loc, (float)time);
-    glUniform2f(resolution_loc, (float)W, (float)H);
-
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    glViewport(0, 0, W, H);
-    glClearColor(0, 0, 0, 1);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glDrawArrays(GL_TRIANGLES, 0, 6);
-    glFinish();
+    if (tuner_status == tsTuned)
+        renderer.set_mode(bmSketch);
+    else if (tuner_status == tsAbove || tuner_status == tsBelow)
+        renderer.set_mode(bmInfo);
+    else renderer.set_mode(bmStatic);
 }

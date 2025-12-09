@@ -20,8 +20,8 @@ class FragSketch : public SketchBase
     FragSketch(int w, int h, GLuint render_fbo, const char *frag);
     void init() override;
     void frame(double dt) override;
-    void unload() override;
-    void reload(double elapsed) override;
+    virtual void unload(double current_time) override;
+    virtual void reload(double current_time) override;
 };
 
 #endif

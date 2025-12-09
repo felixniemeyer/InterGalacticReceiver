@@ -14,8 +14,9 @@ static const int tuned_leave = 8;
 static const int near_enter = 14;
 static const int near_leave = 20;
 
-Tuner::Tuner()
-    : val_buf(val_buf_sz)
+Tuner::Tuner(bool debug_log)
+    : debug_log(debug_log)
+    , val_buf(val_buf_sz)
     , val_buf_cpy(val_buf_sz)
 {
     int r = pthread_mutex_init(&mut, NULL);
@@ -30,7 +31,7 @@ void Tuner::add_station(int freq)
     int val = freq_to_val(freq);
     station_vals.push_back(val);
 
-    printf("Station %.1f added: value is %d\n", freq * 0.1, val);
+    if (debug_log) printf("Station %.1f added: value is %d\n", freq * 0.1, val);
 
     // TODO: Verify station is at least 2 * near_leave away from every existing one
 
@@ -100,7 +101,7 @@ void Tuner::update(int val)
         else if (dist >= tuned_leave) station_status = delta > 0 ? tsAbove : tsBelow;
     }
 
-    if (last_status != station_status)
+    if (last_status != station_status && debug_log)
     {
         printf("Status %2d -> %2d at dist %3d\n", last_status, station_status, dist);
     }

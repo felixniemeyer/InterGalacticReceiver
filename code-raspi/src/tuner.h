@@ -19,6 +19,7 @@ enum TuneStatus
 class Tuner : public IValueListener
 {
   private:
+    const bool debug_log;
     pthread_mutex_t mut;
     std::vector<int> station_vals;
     static const int val_buf_sz = 9;
@@ -34,7 +35,7 @@ class Tuner : public IValueListener
   public:
     static int val_to_freq(int val);
     static int freq_to_val(int freq);
-    Tuner();
+    Tuner(bool debug_log);
     void update(int val) override;
     void add_station(int freq);
     void get_status(int &ix, TuneStatus &status);

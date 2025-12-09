@@ -18,8 +18,8 @@ class SketchBase
     SketchBase();
     virtual void init() = 0;
     virtual void frame(double dt) = 0;
-    virtual void unload() = 0;
-    virtual void reload(double elapsed) = 0;
+    virtual void unload(double current_time) {};
+    virtual void reload(double current_time) {};
     virtual ~SketchBase() = default;
 };
 

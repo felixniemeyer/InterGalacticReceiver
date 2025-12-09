@@ -70,7 +70,7 @@ void FragSketch::frame(double dt)
     glFinish();
 }
 
-void FragSketch::unload()
+void FragSketch::unload(double current_time)
 {
     glDeleteBuffers(1, &vbo);
     vbo = 0;
@@ -82,8 +82,8 @@ void FragSketch::unload()
     vs = 0;
 }
 
-void FragSketch::reload(double elapsed)
+void FragSketch::reload(double current_time)
 {
-    time += elapsed;
+    time = current_time;
     init();
 }

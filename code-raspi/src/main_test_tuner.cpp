@@ -13,7 +13,7 @@
 
 static uint8_t *font_data;
 static size_t font_data_size;
-static Tuner tuner;
+static Tuner tuner(true);
 
 void test_tuner()
 {
