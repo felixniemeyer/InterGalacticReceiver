@@ -15,6 +15,14 @@ RaySketch::RaySketch(int w, int h, GLuint render_fbo)
     load_png(&bg_pixels, &bg_w, &bg_h, bg_file_name);
 }
 
+// clang-format off
+static const float cam_mat_vals[] = {
+    1, 0, 0,
+    0, 1, 0,
+    0, 0, -0.8660254037844387,
+};
+// clang-format on
+
 void RaySketch::frame(double dt)
 {
     time += dt;
@@ -31,10 +39,14 @@ void RaySketch::frame(double dt)
 
     GLint time_loc = glGetUniformLocation(prog, "time");
     GLint resolution_loc = glGetUniformLocation(prog, "resolution");
+    GLint cam_pos_loc = glGetUniformLocation(prog, "camPos");
+    GLint cam_mat_loc = glGetUniformLocation(prog, "camMat");
     GLint bg_tex_loc = glGetUniformLocation(prog, "bgTex");
 
     glUniform1f(time_loc, (float)time);
     glUniform2f(resolution_loc, (float)w, (float)h);
+    glUniform3f(cam_pos_loc, 0, 0, 10);
+    glUniformMatrix3fv(cam_mat_loc, 1, GL_TRUE, cam_mat_vals);
     glUniform1i(bg_tex_loc, 0);
 
     glBindFramebuffer(GL_FRAMEBUFFER, render_fbo);
