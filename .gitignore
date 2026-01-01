@@ -2,7 +2,6 @@
 .pio
 .vs
 .idea
-lib/
 obj/
 bin/
 electronics/**/*-backups
