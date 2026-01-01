@@ -3,9 +3,11 @@ precision highp float;
 
 uniform float time;
 uniform vec2 resolution;
+uniform sampler2D bgTex;
 out vec4 fragColor;
 
 void main() {
-    vec3 clr = vec3(0.6, 0.0, 0.0);
-    fragColor = vec4(1.0);
+    vec2 uv = gl_FragCoord.xy / resolution;
+    vec3 clr = texture(bgTex, uv).rgb;
+    fragColor = vec4(clr, 1.0);
 }

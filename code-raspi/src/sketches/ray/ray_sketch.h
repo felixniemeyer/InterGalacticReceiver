@@ -14,7 +14,7 @@ class RaySketch : public FragSketch
 
   public:
     RaySketch(int w, int h, GLuint render_fbo);
-    // void frame(double dt) override;
+    void frame(double dt) override;
     void init() override;
     void unload(double current_time) override;
     void reload(double current_time) override;

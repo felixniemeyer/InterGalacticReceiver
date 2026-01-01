@@ -23,6 +23,9 @@ void RenderBlender::render(double time)
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
 
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, render_tex);
+
     GLint tex_loc = glGetUniformLocation(render_prog, "tex");
     GLint resolution_loc = glGetUniformLocation(render_prog, "resolution");
     GLint time_loc = glGetUniformLocation(render_prog, "time");

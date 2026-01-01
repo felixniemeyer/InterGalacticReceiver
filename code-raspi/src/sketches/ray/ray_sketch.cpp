@@ -15,31 +15,35 @@ RaySketch::RaySketch(int w, int h, GLuint render_fbo)
     load_png(&bg_pixels, &bg_w, &bg_h, bg_file_name);
 }
 
-// void RaySketch::frame(double dt)
-// {
-//     time += dt;
+void RaySketch::frame(double dt)
+{
+    time += dt;
 
-//     glUseProgram(prog);
+    glUseProgram(prog);
 
-//     glBindBuffer(GL_ARRAY_BUFFER, vbo);
-//     // This is redundant, but it's what we'll need if attributes change frame-by-frame
-//     glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * quad.size(), &quad[0], GL_STATIC_DRAW);
-//     glEnableVertexAttribArray(0);
-//     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * quad.size(), &quad[0], GL_STATIC_DRAW);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
 
-//     GLint time_loc = glGetUniformLocation(prog, "time");
-//     GLint resolution_loc = glGetUniformLocation(prog, "resolution");
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, bg_tex);
 
-//     glUniform1f(time_loc, (float)time);
-//     glUniform2f(resolution_loc, (float)w, (float)h);
+    GLint time_loc = glGetUniformLocation(prog, "time");
+    GLint resolution_loc = glGetUniformLocation(prog, "resolution");
+    GLint bg_tex_loc = glGetUniformLocation(prog, "bgTex");
 
-//     glBindFramebuffer(GL_FRAMEBUFFER, render_fbo);
-//     glViewport(0, 0, w, h);
-//     glClearColor(0, 0, 0, 1);
-//     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-//     glDrawArrays(GL_TRIANGLES, 0, 6);
-//     glFinish();
-// }
+    glUniform1f(time_loc, (float)time);
+    glUniform2f(resolution_loc, (float)w, (float)h);
+    glUniform1i(bg_tex_loc, 0);
+
+    glBindFramebuffer(GL_FRAMEBUFFER, render_fbo);
+    glViewport(0, 0, w, h);
+    glClearColor(0, 0, 0, 1);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+    glFinish();
+}
 
 void RaySketch::init()
 {

@@ -15,7 +15,7 @@ class SketchBase
     static void fill_quad(std::vector<GLfloat> &quad);
 
     // Loads and decodes PNG; looks for file in directory of executable.
-    static void load_png(uint8_t **px_arr, unsigned *w, unsigned *h, const char *fn);
+    static void load_png(uint8_t **px_arr, unsigned int *img_w, unsigned int *img_h, const char *fn);
 
     // Creates texture and fills with pixel data
     static GLuint create_texture(uint8_t *px_arr, unsigned w, unsigned h);
