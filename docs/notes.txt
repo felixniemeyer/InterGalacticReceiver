@@ -1,0 +1,6 @@
+Wildly swinging tuner readings: 10uF cap fixes it
+
+HW TO-DO:
+-- Check if large cap helps knobs
+-- Try cleaning knob pots
+-- New antenna with transparent inlay for LEDs
