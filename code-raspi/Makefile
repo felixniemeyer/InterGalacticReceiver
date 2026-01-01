@@ -11,6 +11,7 @@ OUT_DIR 	= ./out
 
 # Source files
 CPP = $(wildcard $(SRC_DIR)/*.cpp) \
+			$(wildcard $(SRC_DIR)/lib/*.cpp) \
 			$(wildcard $(SRC_DIR)/sketches/*.cpp) \
 			$(wildcard $(SRC_DIR)/sketches/**/*.cpp)
 

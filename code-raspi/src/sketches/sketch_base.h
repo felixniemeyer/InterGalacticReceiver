@@ -14,6 +14,12 @@ class SketchBase
     static void throw_shader_link_error(GLuint prog);
     static void fill_quad(std::vector<GLfloat> &quad);
 
+    // Loads and decodes PNG; looks for file in directory of executable.
+    static void load_png(uint8_t **px_arr, unsigned *w, unsigned *h, const char *fn);
+
+    // Creates texture and fills with pixel data
+    static GLuint create_texture(uint8_t *px_arr, unsigned w, unsigned h);
+
   public:
     SketchBase();
     virtual void init() = 0;

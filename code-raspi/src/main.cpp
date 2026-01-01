@@ -3,12 +3,18 @@
 // Local dependencies
 #include "arg_parse.h"
 #include "error.h"
+#include "file_helpers.h"
 #include "horrors.h"
 #include "magic.h"
 
 // Global
 #include <csignal>
-#include <stdexcept>
+#include <fcntl.h>
+#include <linux/fb.h>
+#include <sys/ioctl.h>
+#include <sys/mman.h>
+
+static const char *font_file_name = "IBMPlexMono-Regular.ttf";
 
 bool app_running = true;
 
@@ -121,4 +127,60 @@ static bool parse_args(int argc, const char *argv[])
         return false;
     }
     else return true;
+}
+
+void flush_to_fb(float *image)
+{
+    int fb = open(FB_PATH, O_RDWR);
+    if (fb < 0)
+        THROWF_ERRNO("Failed to open '%s'", FB_PATH);
+
+    struct fb_var_screeninfo vinfo;
+    struct fb_fix_screeninfo finfo;
+    ioctl(fb, FBIOGET_FSCREENINFO, &finfo);
+    ioctl(fb, FBIOGET_VSCREENINFO, &vinfo);
+
+    // printf("Framebuffer size: %d x %d; bits per pixel: %d\n", vinfo.xres, vinfo.yres, vinfo.bits_per_pixel);
+
+    if (vinfo.xres != W || vinfo.yres != H)
+        THROWF("Framebuffer resolution (%d x %d) doesn't match image size of %d x %d", vinfo.xres, vinfo.yres, W, H);
+
+    if (vinfo.bits_per_pixel != 16)
+        THROWF("Expected 16 bits per pixel, got %d", vinfo.bits_per_pixel);
+
+    long screensize = vinfo.yres_virtual * finfo.line_length;
+    char *fbp = (char *)mmap(0, screensize, PROT_READ | PROT_WRITE, MAP_SHARED, fb, 0);
+    if (fbp == MAP_FAILED)
+        THROWF_ERRNO("Failed to map frame buffer to memory");
+
+    for (int y = 0; y < H; ++y)
+    {
+        int vofs = y * W * 4;
+        for (int x = 0; x < W; ++x)
+        {
+            int ix = vofs + x * 4;
+            float rf = image[ix];
+            float gf = image[ix + 1];
+            float bf = image[ix + 2];
+            unsigned char r = static_cast<unsigned char>(rf * 31.0);
+            unsigned char g = static_cast<unsigned char>(gf * 63.0);
+            unsigned char b = static_cast<unsigned char>(bf * 31.0);
+            int fb_pos = (x + vinfo.xoffset) * (vinfo.bits_per_pixel / 8) +
+                         (y + vinfo.yoffset) * finfo.line_length;
+            unsigned short color = (r << 11) | (g << 5) | (b);
+            // color = 0xffff;
+            // color = 0;
+            *((unsigned short *)(fbp + fb_pos)) = color;
+        }
+    }
+
+    munmap(fbp, screensize);
+    close(fb);
+}
+
+uint8_t *load_canvas_font(size_t *data_size)
+{
+    std::string font_path_full;
+    path_from_bindir(font_file_name, font_path_full);
+    return load_file(font_path_full.c_str(), data_size);
 }

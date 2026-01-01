@@ -6,7 +6,7 @@
 
 class FragSketch : public SketchBase
 {
-  private:
+  protected:
     const int w, h;
     const GLuint render_fbo;
     const char *frag;
@@ -18,8 +18,8 @@ class FragSketch : public SketchBase
 
   public:
     FragSketch(int w, int h, GLuint render_fbo, const char *frag);
-    void init() override;
-    void frame(double dt) override;
+    virtual void init() override;
+    virtual void frame(double dt) override;
     virtual void unload(double current_time) override;
     virtual void reload(double current_time) override;
 };

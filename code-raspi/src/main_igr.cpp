@@ -12,6 +12,7 @@
 
 // Sketches
 #include "sketches/mmgl01/mmgl01_sketch.h"
+#include "sketches/ray/ray_sketch.h"
 #include "sketches/star/star_sketch.h"
 
 // Global
@@ -64,6 +65,7 @@ void init_stations(GLuint render_fbo)
 {
     add_station<StarSketch>(render_fbo, 980);
     add_station<MMGL01Sketch>(render_fbo, 967);
+    add_station<RaySketch>(render_fbo, 953);
 }
 
 void update_station(RenderBlender &renderer, double current_time)
@@ -71,6 +73,10 @@ void update_station(RenderBlender &renderer, double current_time)
     int station_ix;
     TuneStatus tuner_status;
     tuner.get_status(station_ix, tuner_status);
+
+    // DBG
+    // station_ix = 2;
+    // tuner_status = tsTuned;
 
     if (station_ix < -1) return;
 

@@ -1,11 +1,13 @@
 #include "main.h"
 
 // Local dependencies
-#include "canvas_ity.h"
 #include "error.h"
-#include "gfx_helpers.h"
+#include "file_helpers.h"
 #include "hardware_controller.h"
 #include "magic.h"
+
+// Lib
+#include "lib/canvas_ity.h"
 
 // Global
 #include <algorithm>
@@ -47,6 +49,8 @@ void calibrate_readings()
 
     font_data = load_canvas_font(&font_data_size);
     ctx.set_font(font_data, font_data_size, 64);
+    free(font_data);
+    font_data = nullptr;
 
     while (true)
     {
