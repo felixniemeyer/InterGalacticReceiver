@@ -118,14 +118,17 @@ int Tuner::smooth_reading(int val)
 
 int Tuner::val_to_freq(int val)
 {
-    // Know values for Lagrange interpolation:
-    // 144 =>  90 MHz
-    // 473 =>  98 MHz
-    // 703 => 102 MHz
+    // Known values for Lagrange interpolation:
+    // 144 =>  90 MHz !! off
+    // 148 =>  90 MHz
+    // 473 =>  98 MHz !! off
+    // 470 =>  98 MHz
+    // 703 => 102 MHz !! wrong
+    // 750 => 104 MHz
 
-    const double x1 = 144, y1 = 90;
-    const double x2 = 473, y2 = 98;
-    const double x3 = 703, y3 = 102;
+    const double x1 = 148, y1 = 90;
+    const double x2 = 470, y2 = 98;
+    const double x3 = 750, y3 = 104;
 
     double x = val;
 
@@ -140,14 +143,17 @@ int Tuner::val_to_freq(int val)
 
 int Tuner::freq_to_val(int freq)
 {
-    // Know values for Lagrange interpolation:
-    // 144 =>  90 MHz
-    // 473 =>  98 MHz
-    // 703 => 102 MHz
+    // Known values for Lagrange interpolation:
+    // 144 =>  90 MHz !! off
+    // 148 =>  90 MHz
+    // 473 =>  98 MHz !! off
+    // 470 =>  98 MHz
+    // 703 => 102 MHz !! wrong
+    // 750 => 104 MHz
 
-    const double y1 = 144, x1 = 90;
-    const double y2 = 473, x2 = 98;
-    const double y3 = 703, x3 = 102;
+    const double y1 = 148, x1 = 90;
+    const double y2 = 470, x2 = 98;
+    const double y3 = 750, x3 = 104;
 
     double x = freq * 0.1;
 
