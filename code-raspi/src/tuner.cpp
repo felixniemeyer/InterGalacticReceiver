@@ -10,9 +10,9 @@
 #include <string.h>
 
 static const int tuned_enter = 2;
-static const int tuned_leave = 8;
-static const int near_enter = 14;
-static const int near_leave = 20;
+static const int tuned_leave = 6;
+static const int near_enter = 12;
+static const int near_leave = 16;
 
 Tuner::Tuner(bool debug_log)
     : debug_log(debug_log)

@@ -34,7 +34,7 @@ void test_tuner()
 
     float cw = ctx.measure_text(" ");
 
-    while (true)
+    while (app_running)
     {
         usleep(100000);
         int vtuner, aknob, bknob, cknob, swtch;

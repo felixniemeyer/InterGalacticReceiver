@@ -22,7 +22,7 @@ class Tuner : public IValueListener
     const bool debug_log;
     pthread_mutex_t mut;
     std::vector<int> station_vals;
-    static const int val_buf_sz = 9;
+    static const int val_buf_sz = 2;
     std::vector<int> val_buf;
     std::vector<int> val_buf_cpy;
     int val_ix = 0;

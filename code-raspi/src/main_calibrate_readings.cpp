@@ -52,7 +52,7 @@ void calibrate_readings()
     free(font_data);
     font_data = nullptr;
 
-    while (true)
+    while (app_running)
     {
         ++loop_count;
         int tuner, aknob, bknob, cknob, swtch;
