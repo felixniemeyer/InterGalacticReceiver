@@ -5,6 +5,7 @@ uniform sampler2D bgTex;
 uniform vec2 resolution;
 uniform vec3 camPos;
 uniform mat3 camMat;
+uniform mat3 rotMat;
 uniform float time;
 out vec4 outColor;
 
@@ -66,9 +67,10 @@ float scene(vec3 pos) {
 //    // Sphere
 //    return length(pos - sphere1.xyz) - sphere1.w;
 
-    pos = doRotZ(pos, time * 0.3);
-    pos = doRotY(pos, time * 0.34);
-    pos = doRotX(pos, time * 0.37);
+    // pos = doRotZ(pos, time * 0.3);
+    // pos = doRotY(pos, time * 0.34);
+    // pos = doRotX(pos, time * 0.37);
+    pos = rotMat * pos;
     vec3 q = abs(pos) - vec3(3.0, 2.0, 1.5);
     float d = length(max(q, 0.0)) + min(max(q.x, max(q.y, q.z)), 0.0);
     return d - 0.05;

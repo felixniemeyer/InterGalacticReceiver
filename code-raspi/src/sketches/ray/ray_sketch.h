@@ -1,6 +1,7 @@
 #ifndef RAY_SKETCH_H
 #define RAY_SKETCH_H
 
+#include "lib/q3dmath.h"
 #include "sketch_frag.h"
 #include <vector>
 
@@ -11,6 +12,15 @@ class RaySketch : public FragSketch
     unsigned int bg_w;
     unsigned int bg_h;
     GLuint bg_tex = 0;
+    Vector3 cam_pos;
+    Vector3 look_at;
+    Matrix3 cam_mat;
+    float cam_mat_arr[9];
+    Matrix3 rot_mat;
+    float rot_mat_arr[9];
+
+  public:
+    void calc_matrices();
 
   public:
     RaySketch(int w, int h, GLuint render_fbo);
