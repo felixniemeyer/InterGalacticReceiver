@@ -49,12 +49,13 @@ void setup()
     // Device outputs
     pinMode(LIGHT_CTRL_PIN, OUTPUT);
     // digitalWrite(LIGHT_CTRL_PIN, HIGH);
+    pinMode(VIBE_CTRL_PIN, OUTPUT);
 
     // CPU clock 10MHz: prescaler enabled, DIV2
     CCP = CCP_IOREG_gc;
     CLKCTRL.MCLKCTRLB = CLKCTRL_PDIV_2X_gc | CLKCTRL_PEN_bm;
 
-    // Timer B, 250 times per second
+    // Timer B, MEASURE_FREQ times per second (500)
     TCB0.CTRLA = 0;
     TCB0.CTRLB = TCB_CNTMODE_INT_gc;
     TCB0.CCMP = (10000000UL / MEASURE_FREQ) - 1;
@@ -66,6 +67,13 @@ void setup()
     Wire.onReceive(onWireReceive);
     Wire.onRequest(onWireRequest);
 }
+
+static uint32_t tick_counter = 0;
+
+// When last vibe action started
+static uint32_t vibe_start = 0;
+// 0: no vibe; 1: beepbeep; 2: boop
+static uint8_t vibe_action = 0;
 
 ISR(TCB0_INT_vect)
 {
@@ -83,6 +91,34 @@ ISR(TCB0_INT_vect)
     {
         if (digitalRead(KNOB_SWITCH_PIN) == LOW) break;
     }
+
+    // beep beep
+    if (vibe_action == 1)
+    {
+        uint16_t elapsed = (uint16_t)(tick_counter - vibe_start);
+        if (elapsed < BEEP_TICKS || (elapsed > BEEP_TICKS + BEEP_DELAY && elapsed < 2 * BEEP_TICKS + BEEP_DELAY))
+            digitalWrite(VIBE_CTRL_PIN, HIGH);
+        else
+            digitalWrite(VIBE_CTRL_PIN, LOW);
+        if (elapsed > 3 * BEEP_TICKS)
+            vibe_action = 0;
+    }
+    // boop
+    else if (vibe_action == 2)
+    {
+        uint16_t elapsed = (uint16_t)(tick_counter - vibe_start);
+        if (elapsed < BOOP_TICKS)
+            digitalWrite(VIBE_CTRL_PIN, HIGH);
+        else
+            digitalWrite(VIBE_CTRL_PIN, LOW);
+        if (elapsed > BOOP_TICKS)
+            vibe_action = 0;
+    }
+
+    // if ((tick_counter % MEASURE_FREQ) < 50) digitalWrite(VIBE_CTRL_PIN, HIGH);
+    // else digitalWrite(VIBE_CTRL_PIN, LOW);
+
+    ++tick_counter;
 }
 
 static void onWireReceive(int byteCount)
@@ -119,7 +155,7 @@ void loop()
 
 void handleCommand(uint8_t cmd)
 {
-    if (cmd == 0x00)
+    if (cmd == 0x00) // get readings
     {
         InputReadings data;
         cli();
@@ -133,12 +169,30 @@ void handleCommand(uint8_t cmd)
         memcpy((void *)sendBuf, &data, sendBytes);
         sei();
     }
-    else if (cmd == 0x10)
+    else if (cmd == 0x10) // light off
     {
         digitalWrite(LIGHT_CTRL_PIN, LOW);
     }
-    else if (cmd == 0x11)
+    else if (cmd == 0x11) // light on
     {
         digitalWrite(LIGHT_CTRL_PIN, HIGH);
+    }
+    else if (cmd == 0x20) // beep-beep
+    {
+        cli();
+        // Only if currently not vibing
+        if (vibe_action == 0)
+        {
+            vibe_action = 1;
+            vibe_start = tick_counter;
+        }
+        sei();
+    }
+    else if (cmd == 0x21) // boop
+    {
+        cli();
+        vibe_action = 2;
+        vibe_start = tick_counter;
+        sei();
     }
 }

@@ -15,5 +15,8 @@
 #define SLAVE_ADDRESS       0x50
 
 #define MEASURE_FREQ        500
+#define BEEP_TICKS          80
+#define BEEP_DELAY          50
+#define BOOP_TICKS          150
 
 #endif
