@@ -9,6 +9,7 @@
 #include "render_blender.h"
 #include "sketch_base.h"
 #include "tuner.h"
+#include "tuning_feedback.h"
 
 // Sketches
 #include "sketches/mmgl01/mmgl01_sketch.h"
@@ -23,7 +24,7 @@ static std::vector<SketchBase *> sketches;
 static int sketch_ix = -1;
 
 static void init_stations(GLuint render_fbo);
-static void update_station(RenderBlender &renderer, double current_time);
+static void update_station(TuningFeedback &tfb, RenderBlender &renderer, double current_time);
 
 void main_igr()
 {
@@ -32,6 +33,8 @@ void main_igr()
 
     HardwareController::set_listeners(&tuner);
     HardwareController::init();
+
+    TuningFeedback tfb;
 
     FPS fps(TARGET_FPS);
     double last_time = fps.frame_start();
@@ -42,7 +45,7 @@ void main_igr()
         double dt = current_time - last_time;
         last_time = current_time;
 
-        update_station(renderer, current_time);
+        update_station(tfb, renderer, current_time);
         if (sketch_ix == -1) continue;
 
         sketches[sketch_ix]->frame(dt);
@@ -68,11 +71,13 @@ void init_stations(GLuint render_fbo)
     add_station<RaySketch>(render_fbo, 953);
 }
 
-void update_station(RenderBlender &renderer, double current_time)
+void update_station(TuningFeedback &tfb, RenderBlender &renderer, double current_time)
 {
     int station_ix;
     TuneStatus tuner_status;
     tuner.get_status(station_ix, tuner_status);
+
+    tfb.tune_status(tuner_status);
 
     // DBG
     // station_ix = 2;

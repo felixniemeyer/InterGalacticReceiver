@@ -6,6 +6,7 @@
 #include "hardware_controller.h"
 #include "magic.h"
 #include "tuner.h"
+#include "tuning_feedback.h"
 
 // Lib
 #include "lib/canvas_ity.h"
@@ -16,6 +17,7 @@
 static uint8_t *font_data;
 static size_t font_data_size;
 static Tuner tuner(true);
+static TuningFeedback tfb;
 
 void test_tuner()
 {
@@ -56,6 +58,8 @@ void test_tuner()
         int station_ix;
         TuneStatus tuner_status;
         tuner.get_status(station_ix, tuner_status);
+
+        tfb.tune_status(tuner_status);
 
         const float xmid = W / 2.0 - 1.5 * cw;
         if (tuner_status == tsNone)

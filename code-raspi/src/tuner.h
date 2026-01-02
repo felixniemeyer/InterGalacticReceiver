@@ -1,20 +1,11 @@
 #ifndef TUNER_H
 #define TUNER_H
 
+#include "tune_status.h"
 #include "value_listener_if.h"
 #include <pthread.h>
 #include <stdint.h>
 #include <vector>
-
-enum TuneStatus
-{
-    tsFarAbove = 2,
-    tsAbove = 1,
-    tsTuned = 0,
-    tsBelow = -1,
-    tsFarBelow = -2,
-    tsNone = 99,
-};
 
 class Tuner : public IValueListener
 {

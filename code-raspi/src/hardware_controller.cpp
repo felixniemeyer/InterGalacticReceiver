@@ -198,3 +198,10 @@ void HardwareController::set_light(bool on)
     Lock lock(&mut);
     commands.push_back(cmd);
 }
+
+void HardwareController::buzz(BuzzType bt)
+{
+    Lock lock(&mut);
+    if (bt == btBeepBeep) commands.push_back(0x20);
+    else if (bt == btBoop) commands.push_back(0x21);
+}
