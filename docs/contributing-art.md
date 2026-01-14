@@ -34,20 +34,20 @@ Immeditaly after instantiation, `igr` calls the sketch's `init()` method. This i
 `igr` calls the sketch's `frame()` function every time a new frame is needed.
 
 - `igr` targets a frame rate of 50, which is what matches the PAL video format.
-- `frame()` gets a single argument, which is the time elapsed since the last frame, in seconds. This is more useful if you want to smoothly speed up or slow down animations based on user input, like the position of one of the knobs on the Receiver.
-- `frame()` must render to the framebuffer it received in the constructor.
+- `frame()` gets a single argument, which is the time elapsed since the last frame, in seconds. This is more useful than current time if you want to smoothly speed up or slow down animations based on user input, like the position of one of the knobs on the Receiver.
+- `frame()` must render to the framebuffer the sketch received in the constructor.
 
 #### Unloading and reloading
 
-If the viewer tunes away from the sketch, `igr` will stop running calling its `frame()` method to render frames.
+If the viewer tunes away from the sketch, `igr` will stop calling its `frame()` method to render frames.
 
-All sketches are instantiated for the whole time the host program is running. Eventually there will be many sketches, and some of these will use a lot of resources such as input or output textures. It's not smart to hog the sketch's resources when the sketch is not even running.
+All sketches are instantiated for the whole time the host program is running. Eventually there will be many sketches in IGR, and some of these will use a lot of resources such as input or output textures. It's not smart to keep the sketch's resources in GPU memory when the sketch is not even running.
 
 Therefore, in `unload()` the sketch is expected to free all the GPU resources it has allocated. This includes attribute buffers, shaders, programs, and textures.
 
 If you use a static image in a texture, it's OK to hold on to that image in main memory; `igr` is not really constrained by classic system resources. Also, loading an image from disk would be unnecessarily slow.
 
-When the viewer tunes into the station again, `igr` calls the sketch's `reload()` method so it can allocate its GPU resources again. It's best to call `init()` from here and do no other meaningful work.
+When the viewer tunes into the station again, `igr` calls the sketch's `reload()` method so it can allocate its GPU resources again. It's best to call `init()` from here and not do any meaningful work.
 
 `reload()` receives the current time as an argument. The elapsed time passed to the next `frame()` call is counted from this moment.
 
@@ -57,9 +57,9 @@ When the viewer is tuning the Receiver (turning the tuning knob continuously), i
 
 * Showing static. In the background, the frames of Sketch X are rendered, but they are never shown.
 * Still showing static. As the viewer tunes closer to the frequency of Sketch Y, X is unloaded and Y is reloaded. Now the frames of Y are rendered and discarded.
-* Showing a dimmed version of Sketch Y's output, with an overlay containig info about the sketch and the artist.
+* Showing a dimmed version of Sketch Y's output, with an overlay containing info about the sketch and the artist.
 * Showing the normal output of Sketch Y.
-* At the "other side" of the station, a dimmed version again with the info overlay.
+* At the other side of the station, a dimmed version again with the info overlay.
 * Static, with the sketch's frames discarded.
 
 The blending of the info overlay over a dimmed view of the sketch's output is why sketches need to render to a framebuffer and not the screen directly.
@@ -90,9 +90,9 @@ So far this page has dealt with the mechanics of the C++ class representing a sk
 
 ### OpenGL version
 
-The Raspbery Pi 4B inside IGR supports OpenGL ES 3.1 is supported. This is also known as GLSL ES 3.10, and is indicated by putting `#version 310 es` at the top of the shader file.
+The Raspbery Pi 4B inside IGR supports OpenGL ES 3.1. This is also known as GLSL ES 3.10, and is indicated by putting `#version 310 es` at the top of the shader file.
 
-This version uses `in`/`out` instead of `attribute` and `varying`. It supports the `for` loops needed for ray tracing (although the GPU is not really fast enough for it).
+This OpenGL version uses `in`/`out` instead of `attribute` and `varying`. It supports the `for` loops needed for ray tracing (although the GPU is not really fast enough for it).
 
 ### Simple fragment shaders
 
