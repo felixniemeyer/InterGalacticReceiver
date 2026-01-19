@@ -11,10 +11,13 @@
 #define KNOB_B_PIN          PIN_PA2
 #define KNOB_C_PIN          PIN_PA3
 #define TUNER_PIN           PIN_PA4
+#define LEDA_PIN            PIN_PC0
+#define LEDB_PIN            PIN_PC1
 
 #define SLAVE_ADDRESS       0x50
 
 #define MEASURE_FREQ        500
+#define PWM_FREQ            20000
 #define BEEP_TICKS          80
 #define BEEP_DELAY          50
 #define BOOP_TICKS          150
