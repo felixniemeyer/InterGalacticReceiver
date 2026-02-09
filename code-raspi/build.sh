@@ -1,7 +1,7 @@
 #!/bin/bash
 
 pushd src/sketches
-make
+make || { echo "ERROR: make failed in src/sketches" >&2; exit 1; }
 popd
 
 make
