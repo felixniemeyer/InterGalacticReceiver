@@ -9,6 +9,7 @@ class TuningFeedback
   private:
     uint32_t last_changed_at = 0;
     TuneStatus prev_status = tsNone;
+    bool is_pumming = false;
 
   private:
     static uint32_t get_msec();

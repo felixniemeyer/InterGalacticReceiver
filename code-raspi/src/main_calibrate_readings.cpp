@@ -43,6 +43,16 @@ void calibrate_readings()
 {
     HardwareController::init();
 
+    HardwareController::set_led(laOn);
+    sleep(1);
+    HardwareController::set_led(laPum);
+    sleep(10);
+    HardwareController::set_led(laBlinkA);
+    sleep(2);
+    HardwareController::set_led(laBlinkB);
+    sleep(2);
+    HardwareController::set_led(laOff);
+
     canvas_ity::canvas ctx(W, H);
     float *image = new float[H * W * 4];
     char buf[64];

@@ -52,6 +52,10 @@ void main_igr()
         renderer.render(current_time);
         put_on_screen();
         fps.frame_end();
+
+        int tuner, aknob, bknob, cknob, swtch;
+        HardwareController::get_values(tuner, aknob, bknob, cknob, swtch);
+        HardwareController::set_light(swtch == 0);
     }
 }
 

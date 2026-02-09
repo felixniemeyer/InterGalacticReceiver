@@ -172,6 +172,13 @@ void *HardwareController::loop(void *)
 
 void HardwareController::process_values(const InputReadings &data)
 {
+    if (data.aKnob >= 1024 || data.bKnob >= 1024 || data.bKnob >= 1024)
+        return;
+    if (data.swtch != 0 && data.swtch != 15)
+        return;
+    if (data.aKnob == 0 || data.bKnob == 0 || data.cKnob == 0 || data.tuner == 0)
+        return;
+    if (data.tuner >= 1024) return;
     // Discard nonsense values
     if (data.tuner > 100 && data.tuner < 924)
         __atomic_store_n(&val_tuner, (int)data.tuner, __ATOMIC_SEQ_CST);
@@ -204,4 +211,14 @@ void HardwareController::buzz(BuzzType bt)
     Lock lock(&mut);
     if (bt == btBeepBeep) commands.push_back(0x20);
     else if (bt == btBoop) commands.push_back(0x21);
+}
+
+void HardwareController::set_led(LEDAction action)
+{
+    Lock lock(&mut);
+    if (action == laOff) commands.push_back(0x30);
+    else if (action == laOn) commands.push_back(0x31);
+    else if (action == laPum) commands.push_back(0x32);
+    else if (action == laBlinkA) commands.push_back(0x33);
+    else if (action == laBlinkB) commands.push_back(0x34);
 }

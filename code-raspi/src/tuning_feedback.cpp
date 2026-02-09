@@ -33,7 +33,12 @@ void TuningFeedback::tune_status(TuneStatus status)
     if (status == tsTuned)
     {
         // Boop buzz
-        HardwareController::buzz(btBoop);
+        // DBG: disabled
+        // HardwareController::buzz(btBoop);
+        HardwareController::set_led(laOff);
+        HardwareController::set_led(laOff);
+        HardwareController::set_led(laOn);
+        is_pumming = false;
     }
     // Going to above/below
     else if (status == tsAbove || status == tsBelow)
@@ -42,8 +47,25 @@ void TuningFeedback::tune_status(TuneStatus status)
         // No buzz when we're leaving station, or if last change was less than a second ago
         if (prev_status != tsTuned && elapsed > 1000)
         {
-            HardwareController::buzz(btBeepBeep);
+            // DBG: disabled
+            // HardwareController::buzz(btBeepBeep);
         }
+        // DBG
+        HardwareController::set_led(laOff);
+        HardwareController::set_led(laOff);
+        HardwareController::set_led(status == tsAbove ? laBlinkA : laBlinkB);
+        is_pumming = false;
+    }
+    else
+    {
+        // DBG
+        if (!is_pumming)
+        {
+            HardwareController::set_led(laOff);
+            HardwareController::set_led(laOff);
+            HardwareController::set_led(laPum);
+        }
+        is_pumming = true;
     }
 
     // Store change

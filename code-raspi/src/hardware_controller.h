@@ -14,6 +14,15 @@ enum BuzzType
     btBoop,
 };
 
+enum LEDAction
+{
+    laOff,
+    laOn,
+    laPum,
+    laBlinkA,
+    laBlinkB,
+};
+
 class HardwareController
 {
   private:
@@ -42,6 +51,7 @@ class HardwareController
     static void exit();
     static void get_values(int &tuner, int &aknob, int &bknob, int &cknob, int &swtch);
     static void set_light(bool on);
+    static void set_led(LEDAction action);
     static void buzz(BuzzType bt);
 };
 
