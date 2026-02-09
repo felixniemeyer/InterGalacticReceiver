@@ -2,7 +2,6 @@
 #define SKETCH_FRAG_H
 
 #include "sketch_base.h"
-#include <vector>
 
 class FragSketch : public SketchBase
 {

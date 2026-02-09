@@ -21,7 +21,6 @@ class RenderBlender
     BlendMode mode = bmStatic;
 
   private:
-    void init_render_target();
     void compile_render_prog();
 
   public:

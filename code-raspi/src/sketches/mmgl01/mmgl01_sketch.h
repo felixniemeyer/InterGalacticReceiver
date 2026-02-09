@@ -2,7 +2,6 @@
 #define MMGL01_SKETCH_H
 
 #include "sketch_frag.h"
-#include <vector>
 
 class MMGL01Sketch : public FragSketch
 {

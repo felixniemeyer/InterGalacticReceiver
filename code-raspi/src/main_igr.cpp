@@ -12,6 +12,8 @@
 #include "tuning_feedback.h"
 
 // Sketches
+#include "sketches/bezix/bezix_sketch.h"
+#include "sketches/cell/cell_sketch.h"
 #include "sketches/mmgl01/mmgl01_sketch.h"
 #include "sketches/ray/ray_sketch.h"
 #include "sketches/star/star_sketch.h"
@@ -73,6 +75,8 @@ void init_stations(GLuint render_fbo)
     add_station<StarSketch>(render_fbo, 980);
     add_station<MMGL01Sketch>(render_fbo, 967);
     add_station<RaySketch>(render_fbo, 953);
+    add_station<CellSketch>(render_fbo, 941);
+    add_station<BezixSketch>(render_fbo, 932);
 }
 
 void update_station(TuningFeedback &tfb, RenderBlender &renderer, double current_time)

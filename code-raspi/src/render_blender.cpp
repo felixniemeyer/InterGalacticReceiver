@@ -11,7 +11,7 @@
 
 RenderBlender::RenderBlender()
 {
-    init_render_target();
+    SketchBase::create_target_texture(W, H, render_tex, render_fbo, render_depth);
     compile_render_prog();
 }
 
@@ -46,33 +46,6 @@ void RenderBlender::render(double time)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glDrawArrays(GL_TRIANGLES, 0, 6);
     glFinish();
-}
-
-void RenderBlender::init_render_target()
-{
-    // Texture
-    glGenTextures(1, &render_tex);
-    glBindTexture(GL_TEXTURE_2D, render_tex);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, W, H, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-    // Framebuffer and attach texture
-    glGenFramebuffers(1, &render_fbo);
-    glBindFramebuffer(GL_FRAMEBUFFER, render_fbo);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, render_tex, 0);
-
-    // Depth buffer
-    glGenRenderbuffers(1, &render_depth);
-    glBindRenderbuffer(GL_RENDERBUFFER, render_depth);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, W, H);
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, render_depth);
-
-    GLenum res = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-    if (res != GL_FRAMEBUFFER_COMPLETE)
-        THROWF("Render target FBO failed to build: 0x%04X", (int)res);
-
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 void RenderBlender::compile_render_prog()

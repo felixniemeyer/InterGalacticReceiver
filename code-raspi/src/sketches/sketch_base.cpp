@@ -81,3 +81,30 @@ GLuint SketchBase::create_texture(uint8_t *px_arr, unsigned w, unsigned h)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     return tex;
 }
+
+void SketchBase::create_target_texture(unsigned w, unsigned h, GLuint &tex, GLuint &fbo, GLuint &depth)
+{
+    // Texture
+    glGenTextures(1, &tex);
+    glBindTexture(GL_TEXTURE_2D, tex);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+    // Framebuffer and attach texture
+    glGenFramebuffers(1, &fbo);
+    glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex, 0);
+
+    // Depth buffer
+    glGenRenderbuffers(1, &depth);
+    glBindRenderbuffer(GL_RENDERBUFFER, depth);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, w, h);
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depth);
+
+    GLenum res = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+    if (res != GL_FRAMEBUFFER_COMPLETE)
+        THROWF("Render target FBO failed to build: 0x%04X", (int)res);
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}

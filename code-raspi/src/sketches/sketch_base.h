@@ -20,6 +20,9 @@ class SketchBase
     // Creates texture and fills with pixel data
     static GLuint create_texture(uint8_t *px_arr, unsigned w, unsigned h);
 
+    // Creates a target texture and FBO for interim rendering
+    static void create_target_texture(unsigned w, unsigned h, GLuint &tex, GLuint &fbo, GLuint &depth);
+
   public:
     SketchBase();
     virtual void init() = 0;
