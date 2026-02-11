@@ -58,7 +58,8 @@ void main_igr()
 
         int tuner, aknob, bknob, cknob, swtch;
         HardwareController::get_values(tuner, aknob, bknob, cknob, swtch);
-        HardwareController::set_light(swtch == 0);
+        // DBG: Don't turn on light
+        // HardwareController::set_light(swtch == 0);
     }
 }
 
@@ -90,8 +91,8 @@ void update_station(TuningFeedback &tfb, RenderBlender &renderer, double current
     tfb.tune_status(tuner_status);
 
     // DBG
-    // station_ix = 2;
-    // tuner_status = tsTuned;
+    station_ix = 5;
+    tuner_status = tsTuned;
 
     if (station_ix < -1) return;
 

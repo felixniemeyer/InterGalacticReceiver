@@ -37,7 +37,7 @@ void TuningFeedback::tune_status(TuneStatus status)
         // HardwareController::buzz(btBoop);
         HardwareController::set_led(laOff);
         HardwareController::set_led(laOff);
-        HardwareController::set_led(laOn);
+        // HardwareController::set_led(laOn); // DBG
         is_pumming = false;
     }
     // Going to above/below
@@ -53,7 +53,7 @@ void TuningFeedback::tune_status(TuneStatus status)
         // DBG
         HardwareController::set_led(laOff);
         HardwareController::set_led(laOff);
-        HardwareController::set_led(status == tsAbove ? laBlinkA : laBlinkB);
+        // HardwareController::set_led(status == tsAbove ? laBlinkA : laBlinkB); // DBG
         is_pumming = false;
     }
     else
