@@ -8,7 +8,7 @@ class AnomalySketch : public FragSketch
   private:
     GLint camera_pos_loc = -1;
     GLint camera_basis_loc = -1;
-    GLint wobble_time_loc = -1;
+    GLint hash_offset_loc = -1;
     GLint noise_tex_loc = -1;
     GLint noise_period_loc = -1;
     GLuint anomaly_vbo = 0;

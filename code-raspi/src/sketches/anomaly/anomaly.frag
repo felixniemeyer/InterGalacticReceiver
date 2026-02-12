@@ -3,7 +3,7 @@ precision highp float;
 
 uniform vec3 cameraPos;
 uniform vec4 cameraBasis;
-uniform float wobbleTime;
+uniform vec2 hashOffset;
 uniform sampler2D noiseTex;
 uniform float noisePeriod;
 in vec2 vXZ;
@@ -17,21 +17,24 @@ const float halfPI = 0.5 * PI;
 
 const int MAX_STEPS = 7;
 
+float hash21(vec2 p) {
+  p = fract(p * vec2(123.34, 456.21));
+  p += dot(p, p + 23.45);
+  return fract(p.x * p.y);
+}
+
 float surface(vec2 p) {
   vec2 uv = fract(p / noisePeriod);
   return texture(noiseTex, uv).r;
 }
 
-
 float sdf(vec3 p) {
   float height = -surface(10. + p.xz * 0.7) * terrainHeight; 
-  p.y -= abs(fract(wobbleTime + p.x * 0.1) - 0.5); 
   return p.y - height;
 }
 
 float cheapHash(vec2 p) {
-  vec2 uv = fract((p * 0.125) + vec2(wobbleTime * 0.17, wobbleTime * 0.11));
-  return texture(noiseTex, uv).r;
+  return hash21(p + hashOffset);
 }
 
 void main() {

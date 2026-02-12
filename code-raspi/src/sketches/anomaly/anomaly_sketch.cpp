@@ -128,7 +128,7 @@ void AnomalySketch::init()
     glUseProgram(prog);
     camera_pos_loc = glGetUniformLocation(prog, "cameraPos");
     camera_basis_loc = glGetUniformLocation(prog, "cameraBasis");
-    wobble_time_loc = glGetUniformLocation(prog, "wobbleTime");
+    hash_offset_loc = glGetUniformLocation(prog, "hashOffset");
     noise_tex_loc = glGetUniformLocation(prog, "noiseTex");
     noise_period_loc = glGetUniformLocation(prog, "noisePeriod");
 
@@ -169,7 +169,9 @@ void AnomalySketch::frame(double dt)
 
     glUniform3f(camera_pos_loc, t, 2.0f, 0.0f);
     glUniform4f(camera_basis_loc, upx, upy, rightx, righty);
-    glUniform1f(wobble_time_loc, t * 0.1f);
+    float h0 = t * 0.001f;
+    float h1 = t * 0.001731f + 0.37f;
+    glUniform2f(hash_offset_loc, h0, h1);
 
     glBindFramebuffer(GL_FRAMEBUFFER, render_fbo);
     glViewport(0, 0, w, h);
