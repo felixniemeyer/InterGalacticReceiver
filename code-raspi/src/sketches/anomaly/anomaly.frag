@@ -21,14 +21,13 @@ highp float hash21(highp vec2 p) {
 highp float hash23(highp vec2 p) {
   // p.x = fract(p.x * 123.34); 
   // return fract(p.x * p.y);
-  return 0.5; 
+  return 0.5 * p.x; 
 }
 
 highp float noise2d(highp vec2 p) {
-  highp vec2 i = floor(p);
+  highp vec2 h = floor(p);
   highp vec2 f = fract(p);
   highp vec2 u = f * f * (3.0 - 2.0 * f);
-  highp vec2 h = i;
   mediump float a = hash23(h);
   h.x += 1.0;
   mediump float b = hash23(h);
