@@ -23,13 +23,8 @@ float hash21(vec2 p) {
   return fract(p.x * p.y);
 }
 
-float surface(vec2 p) {
-  vec2 uv = fract(p / noisePeriod);
-  return texture(noiseTex, uv).r;
-}
-
 float sdf(vec3 p) {
-  float height = -surface(10. + p.xz * 0.7) * terrainHeight; 
+  float height = -texture(noiseTex, p.xz * 0.01).r * terrainHeight; 
   return p.y - height;
 }
 
