@@ -14,7 +14,7 @@ const float terrainHeight = 5.0;
 const int MAX_STEPS = 7;
 
 float sdf(vec3 p) {
-  float height = -texture(noiseTex, p.xz * 0.01).r * terrainHeight; 
+  float height = -texture(noiseTex, p.xz * 0.0087).r * terrainHeight; 
   return p.y - height;
 }
 
