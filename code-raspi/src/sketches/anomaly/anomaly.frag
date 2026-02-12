@@ -1,5 +1,5 @@
 #version 310 es
-precision highp float;
+precision mediump float;
 
 uniform vec3 cameraPos;
 uniform vec4 cameraBasis;
@@ -13,7 +13,7 @@ const float terrainHeight = 5.0;
 
 const int MAX_STEPS = 7;
 
-float hash21(vec2 p) {
+highp float hash21(highp vec2 p) {
   p = fract(p * vec2(123.34, 456.21));
   p += dot(p, p + 23.45);
   return fract(p.x * p.y);
@@ -24,7 +24,7 @@ float sdf(vec3 p) {
   return p.y - height;
 }
 
-float cheapHash(vec2 p) {
+highp float cheapHash(highp vec2 p) {
   return hash21(p + hashOffset);
 }
 
@@ -86,5 +86,5 @@ void main() {
   float fog = 1. - 5. / (depth - terrainHeight * 0.5 + 5.0);
   vec3 color = clamp(mix(terrainColor * 2., skyColor, fog), 0., 1.); 
 
-  fragColor = vec4(color, 1.0);
+  fragColor = vec4(color, 0.66);
 }

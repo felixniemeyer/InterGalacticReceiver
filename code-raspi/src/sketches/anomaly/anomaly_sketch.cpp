@@ -190,7 +190,8 @@ void AnomalySketch::init()
     glGetProgramiv(prog, GL_LINK_STATUS, &ok);
     if (!ok) throw_shader_link_error(prog);
 
-    glDisable(GL_BLEND);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glDisable(GL_DEPTH_TEST);
 
     glGenBuffers(1, &anomaly_vbo);
@@ -236,8 +237,6 @@ void AnomalySketch::frame(double dt)
 
     glBindFramebuffer(GL_FRAMEBUFFER, render_fbo);
     glViewport(0, 0, w, h);
-    glClearColor(0, 0, 0, 1);
-    glClear(GL_COLOR_BUFFER_BIT);
     glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 
