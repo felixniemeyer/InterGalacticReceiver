@@ -11,6 +11,7 @@ const float rayGravity = 0.25;
 const float terrainHeight = 5.0;
 
 const int MAX_STEPS = 7;
+const highp vec2 LATTICE_K = vec2(0.754877666, 0.569840291);
 
 float hash21(highp vec2 p) {
   p = fract(p * vec2(123.34, 456.21));
@@ -19,16 +20,14 @@ float hash21(highp vec2 p) {
 }
 
 float noise2d(vec2 p) {
-  vec2 h = floor(p);
-  vec2 f = fract(p);
-  vec2 u = f * f * (3.0 - 2.0 * f);
-  mediump float a = hash21(h);
-  h.x += 1.0;
-  mediump float b = hash21(h);
-  h.y += 1.0;
-  mediump float d = hash21(h);
-  h.x -= 1.0;
-  mediump float c = hash21(h);
+  highp vec2 i = floor(p);
+  highp vec2 f = fract(p);
+  highp vec2 u = f * f * (3.0 - 2.0 * f);
+  highp float h00 = fract(dot(i, LATTICE_K));
+  mediump float a = float(h00);
+  mediump float b = float(fract(h00 + LATTICE_K.x));
+  mediump float c = float(fract(h00 + LATTICE_K.y));
+  mediump float d = float(fract(h00 + LATTICE_K.x + LATTICE_K.y));
   return mix(mix(a, b, u.x), mix(c, d, u.x), u.y);
 }
 
