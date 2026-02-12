@@ -64,10 +64,8 @@ void main() {
 
   for (int i = 0; i < MAX_STEPS; i++) {
     float dist = sdf(pos);
-    if (abs(dist) < 0.02) break;
     float step = dist * stepSize; 
     depth += step;
-    if (depth > 40.0) break;
     pos += rayDir * step;
 
     rayDir.y += rayGravity * step * 0.5;
