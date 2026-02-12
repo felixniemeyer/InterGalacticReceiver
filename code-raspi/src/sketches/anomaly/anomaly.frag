@@ -15,7 +15,7 @@ const float terrainHeight = 5.0;
 const float PI = 3.14159265358979323846;
 const float halfPI = 0.5 * PI;
 
-const int MAX_STEPS = 9;
+const int MAX_STEPS = 7;
 
 float hash21(vec2 p) {
   p = fract(p * vec2(123.34, 456.21));
@@ -60,7 +60,7 @@ void main() {
   vec3 rayDir = eyeDirection + vec3(0, rayGravity * skipDistance, 0);
   rayDir *= inversesqrt(dot(rayDir, rayDir));
 
-  float stepSize = 0.6 + 0.2 * uvRnd; 
+  float stepSize = 0.65 + 0.25 * uvRnd; 
 
   for (int i = 0; i < MAX_STEPS; i++) {
     float dist = sdf(pos);
