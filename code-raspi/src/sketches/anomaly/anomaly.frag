@@ -19,8 +19,8 @@ highp float hash21(highp vec2 p) {
 }
 
 highp float hash23(highp vec2 p) {
-  # p.x = fract(p.x * 123.34); 
-  # return fract(p.x * p.y);
+  // p.x = fract(p.x * 123.34); 
+  // return fract(p.x * p.y);
   return 0.5; 
 }
 
