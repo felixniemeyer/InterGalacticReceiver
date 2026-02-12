@@ -18,18 +18,23 @@ highp float hash21(highp vec2 p) {
   return fract(p.x * p.y);
 }
 
+highp float hash23(highp vec2 p) {
+  p.x = fract(p.x * 123.34); 
+  return fract(p.x * p.y);
+}
+
 highp float noise2d(highp vec2 p) {
   highp vec2 i = floor(p);
   highp vec2 f = fract(p);
-  highp vec2 u = f;
+  highp vec2 u = f * f * (3.0 - 2.0 * f);
   highp vec2 h = i;
-  mediump float a = float(hash21(h));
+  mediump float a = hash23(h);
   h.x += 1.0;
-  mediump float b = float(hash21(h));
+  mediump float b = hash23(h);
   h.y += 1.0;
-  mediump float d = float(hash21(h));
+  mediump float d = hash23(h);
   h.x -= 1.0;
-  mediump float c = float(hash21(h));
+  mediump float c = hash23(h);
   return mix(mix(a, b, u.x), mix(c, d, u.x), u.y);
 }
 
