@@ -1,8 +1,12 @@
 #version 310 es
 precision highp float;
 
-uniform float time;
-uniform vec2 resolution;
+uniform vec3 cameraPos;
+uniform vec4 cameraBasis;
+uniform float wobbleTime;
+uniform sampler2D noiseTex;
+uniform float noisePeriod;
+in vec2 vXZ;
 out vec4 fragColor;
 
 const float rayGravity = 0.25;
@@ -12,67 +16,35 @@ const float PI = 3.14159265358979323846;
 const float halfPI = 0.5 * PI;
 
 const int MAX_STEPS = 7;
-float hash21(vec2 p) {
-  p = fract(p * vec2(123.34, 456.21));
-  p += dot(p, p + 23.45);
-  return fract(p.x * p.y);
-}
-
-float noise2d(vec2 p) {
-  vec2 i = floor(p);
-  vec2 f = fract(p);
-  vec2 u = f * f * (3.0 - 2.0 * f);
-  float a = hash21(i);
-  float b = hash21(i + vec2(1.0, 0.0));
-  float c = hash21(i + vec2(0.0, 1.0));
-  float d = hash21(i + vec2(1.0, 1.0));
-  return mix(mix(a, b, u.x), mix(c, d, u.x), u.y);
-}
 
 float surface(vec2 p) {
-  float n1 = noise2d(p);
-  float n1x2 = n1 + n1; 
-  p.x += n1x2;
-  float n2 = noise2d(p + p);
-  return (n1x2 + n2) * 0.333333;
+  vec2 uv = fract(p / noisePeriod);
+  return texture(noiseTex, uv).r;
 }
 
 
 float sdf(vec3 p) {
   float height = -surface(10. + p.xz * 0.7) * terrainHeight; 
-  p.y -= abs(fract(time * 0.1 + p.x * 0.1) - 0.5); 
+  p.y -= abs(fract(wobbleTime + p.x * 0.1) - 0.5); 
   return p.y - height;
 }
 
-float cheapHash(vec2 p, float time) {
-  return hash21(p + time * 0.001);
+float cheapHash(vec2 p) {
+  vec2 uv = fract((p * 0.125) + vec2(wobbleTime * 0.17, wobbleTime * 0.11));
+  return texture(noiseTex, uv).r;
 }
 
-const float aspectRatio = 720.0 / 576.0;
-const float invCornerRadius = 1.0 / 1.60078125;
-
 void main() {
-  vec2 uv = gl_FragCoord.xy / resolution;
-  vec2 screenUV = uv * 2.0 - 1.0;
-  screenUV.x *= aspectRatio;
-  vec2 xz = screenUV * invCornerRadius;
+  vec2 xz = vXZ;
 
-  float uvRnd = cheapHash(xz, time); 
+  float uvRnd = cheapHash(xz); 
 
   float radiusSquared = dot(xz, xz);
   float y = -sqrt(max(1.0 - radiusSquared, 0.0));
   vec3 eyeDirection = vec3(xz.x, y, xz.y);
 
-  vec3 cameraPos = vec3(time,2,0); 
-  float rt = sin(time * 0.3); 
-  vec2 up = vec2(
-    sin(rt), 
-    cos(rt)
-  ); 
-  vec2 right = vec2(
-    up.y, 
-    -up.x
-  ); 
+  vec2 up = cameraBasis.xy;
+  vec2 right = cameraBasis.zw;
   eyeDirection.xz = vec2(
     up.x * eyeDirection.z + right.x * eyeDirection.x, 
     up.y * eyeDirection.z + right.y * eyeDirection.x

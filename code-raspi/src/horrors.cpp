@@ -41,10 +41,9 @@ static SDL_GLContext sdl_gl_ctx = nullptr;
 
 static bool is_raspberry_pi()
 {
-    const char *model_path = "/sys/firmware/devicetree/base/model";
-    std::ifstream model_file(model_path);
+    std::ifstream model_file("/sys/firmware/devicetree/base/model");
+    if (!model_file.good()) model_file.open("/proc/device-tree/model");
     if (!model_file.good()) return false;
-
     std::string model;
     std::getline(model_file, model, '\0');
     return model.find("Raspberry Pi") != std::string::npos;
@@ -52,6 +51,10 @@ static bool is_raspberry_pi()
 
 bool should_use_drm_backend()
 {
+#if !HAS_SDL2
+    // If SDL is not compiled in, DRM is the only available backend.
+    return true;
+#endif
     return is_raspberry_pi();
 }
 
