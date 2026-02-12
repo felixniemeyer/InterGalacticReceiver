@@ -56,7 +56,7 @@ void main() {
     pos += rayDir * step;
 
     rayDir.y += rayGravity * step * 0.5;
-    if(depth>50. || step < 0.001 ) break; 
+    // if(depth>50. || step < 0.001 ) break; // more expensive than without
   }
 
   depth = max(0., depth); 
