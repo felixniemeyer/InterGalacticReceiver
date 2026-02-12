@@ -190,8 +190,7 @@ void AnomalySketch::init()
     glGetProgramiv(prog, GL_LINK_STATUS, &ok);
     if (!ok) throw_shader_link_error(prog);
 
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glDisable(GL_BLEND);
     glDisable(GL_DEPTH_TEST);
 
     glGenBuffers(1, &anomaly_vbo);

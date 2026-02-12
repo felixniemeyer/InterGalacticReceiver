@@ -13,19 +13,15 @@ const float terrainHeight = 5.0;
 
 const int MAX_STEPS = 7;
 
-highp float hash21(highp vec2 p) {
-  p = fract(p * vec2(123.34, 456.21));
-  p += dot(p, p + 23.45);
-  return fract(p.x * p.y);
-}
-
 float sdf(vec3 p) {
   float height = -texture(noiseTex, p.xz * 0.01).r * terrainHeight; 
   return p.y - height;
 }
 
 highp float cheapHash(highp vec2 p) {
-  return hash21(p + hashOffset);
+  p = fract((p + hashOffset) * vec2(123.34, 456.21));
+  p += dot(p, p + 23.45);
+  return fract(p.x * p.y);
 }
 
 void main() {
@@ -86,5 +82,5 @@ void main() {
   float fog = 1. - 5. / (depth - terrainHeight * 0.5 + 5.0);
   vec3 color = clamp(mix(terrainColor * 2., skyColor, fog), 0., 1.); 
 
-  fragColor = vec4(color, 0.66);
+  fragColor = vec4(color, 1.0);
 }
