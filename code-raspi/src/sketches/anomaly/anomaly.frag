@@ -15,7 +15,7 @@ const float terrainHeight = 5.0;
 const float PI = 3.14159265358979323846;
 const float halfPI = 0.5 * PI;
 
-const int MAX_STEPS = 10;
+const int MAX_STEPS = 9;
 
 float hash21(vec2 p) {
   p = fract(p * vec2(123.34, 456.21));
