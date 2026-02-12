@@ -10,7 +10,6 @@ class AnomalySketch : public FragSketch
     GLint camera_basis_loc = -1;
     GLint hash_offset_loc = -1;
     GLint noise_tex_loc = -1;
-    GLint noise_period_loc = -1;
     GLuint anomaly_vbo = 0;
     GLuint noise_tex = 0;
 

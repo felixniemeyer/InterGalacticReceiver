@@ -1,7 +1,5 @@
 #include "anomaly_sketch.h"
 
-#include "horrors.h"
-
 // GLSL
 #include "shaders.h"
 
@@ -14,7 +12,6 @@
 
 namespace {
 static const int NOISE_TEX_SIZE = 512;
-static const float NOISE_PERIOD_UNITS = 32.0f;
 static const float OCTAVE0_SCALE = 1.0f / 16.0f;
 static const float OCTAVE1_SCALE = 1.0f / 8.0f;
 
@@ -205,13 +202,11 @@ void AnomalySketch::init()
     camera_basis_loc = glGetUniformLocation(prog, "cameraBasis");
     hash_offset_loc = glGetUniformLocation(prog, "hashOffset");
     noise_tex_loc = glGetUniformLocation(prog, "noiseTex");
-    noise_period_loc = glGetUniformLocation(prog, "noisePeriod");
 
     noise_tex = create_noise_texture_gpu(quad);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, noise_tex);
     glUniform1i(noise_tex_loc, 0);
-    glUniform1f(noise_period_loc, NOISE_PERIOD_UNITS);
 }
 
 void AnomalySketch::frame(double dt)

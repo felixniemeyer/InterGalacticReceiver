@@ -5,15 +5,11 @@ uniform vec3 cameraPos;
 uniform vec4 cameraBasis;
 uniform vec2 hashOffset;
 uniform sampler2D noiseTex;
-uniform float noisePeriod;
 in vec2 vXZ;
 out vec4 fragColor;
 
 const float rayGravity = 0.25;
 const float terrainHeight = 5.0;
-
-const float PI = 3.14159265358979323846;
-const float halfPI = 0.5 * PI;
 
 const int MAX_STEPS = 7;
 
